@@ -10,6 +10,7 @@
     "confirm": "Confirm",
     "search": "Search",
     "viewAll": "View all",
+    "contactNow": "Contact Now",
     "readMore": "Read more",
     "comingSoon": "Coming soon",
     "free": "Free",
@@ -37,7 +38,151 @@
     "whyUs": "Why Rawad?",
     "statsStudents": "Students",
     "statsCourses": "Courses",
-    "statsGraduates": "Graduates"
+    "statsGraduates": "Graduates",
+    "introVideoTitle": "Meet Rawad Academy",
+    "introVideoSubtitle": "See how we help you learn real skills and apply them to grow your income.",
+    "testimonialsTitle": "What our students say",
+    "testimonialsSubtitle": "Real success stories from learners who changed their path with us.",
+    "whatWeProvideTitle": "What we provide",
+    "whatWeProvideSubtitle": "Services and courses designed to take you from learning to earning.",
+    "servicesTab": "Our services",
+    "coursesTab": "Our courses",
+    "newsTitle": "Latest news",
+    "newsSubtitle": "Keep up with our newest courses, events, and announcements.",
+    "readArticle": "Read article",
+    "watchNow": "Watch now",
+    "services": [
+      {
+        "title": "1:1 personal follow-up",
+        "desc": "Individual guidance over WhatsApp answering your questions and correcting your path."
+      },
+      {
+        "title": "Practical recorded courses",
+        "desc": "Hands-on content you watch on your time, with real projects."
+      },
+      {
+        "title": "Career mentorship sessions",
+        "desc": "Consultations to build your career and grow your income."
+      },
+      {
+        "title": "Certified completion",
+        "desc": "A certificate that proves your achievement and boosts your profile."
+      }
+    ],
+    "provideServices": [
+      {
+        "title": "Project-based learning",
+        "desc": "Every course ends with a practical project for your portfolio."
+      },
+      {
+        "title": "Full flexibility",
+        "desc": "Learn anytime, from anywhere that suits you."
+      },
+      {
+        "title": "Supportive community",
+        "desc": "Join a community of ambitious learners and entrepreneurs."
+      }
+    ],
+    "testimonials": [
+      {
+        "name": "Yousef Abed",
+        "role": "Graphic Designer",
+        "quote": "After the design course I started freelancing and earning a steady monthly income."
+      },
+      {
+        "name": "Mariam Saleh",
+        "role": "Digital Marketer",
+        "quote": "The personal follow-up made a huge difference — I learned and applied it directly to my work."
+      },
+      {
+        "name": "Khaled Nassar",
+        "role": "Web Developer",
+        "quote": "I went from zero to building real websites within a few months."
+      }
+    ],
+    "news": [
+      {
+        "title": "Launching Marketing with AI course",
+        "date": "Soon",
+        "excerpt": "A new course teaching you to leverage AI tools in marketing."
+      },
+      {
+        "title": "Early-bird discounts",
+        "date": "This month",
+        "excerpt": "Up to 20% off for the first registrants in every new course."
+      },
+      {
+        "title": "Free entrepreneurship workshop",
+        "date": "Next week",
+        "excerpt": "A free intro workshop on building a profitable venture from scratch."
+      }
+    ],
+    "marquee": [
+      "Marketing Courses",
+      "AI Courses",
+      "Development Courses",
+      "Content Creation",
+      "Entrepreneurship Advice",
+      "Hiring Opportunities",
+      "1:1 Sessions",
+      "Post-Graduation Follow-up",
+      "Success Guarantee",
+      "Practical Projects",
+      "Certified Diplomas",
+      "Supportive Community"
+    ],
+    "departments": [
+      {
+        "title": "Training Courses",
+        "desc": "Practical courses built to take you from zero to pro and grow your income.",
+        "items": [
+          "Digital marketing courses",
+          "AI courses",
+          "Development courses",
+          "Entrepreneurship"
+        ],
+        "color": "violet"
+      },
+      {
+        "title": "Software Development",
+        "desc": "Build real websites and apps with the latest in-demand technologies.",
+        "items": [
+          "Frontend development",
+          "Web applications",
+          "Practical projects",
+          "Code review"
+        ],
+        "color": "blue"
+      },
+      {
+        "title": "Content Creation",
+        "desc": "Produce professional visual and written content that grows your brand.",
+        "items": [
+          "Graphic design",
+          "Video editing",
+          "Content writing",
+          "Social media management"
+        ],
+        "color": "amber"
+      },
+      {
+        "title": "Follow-up & Sessions",
+        "desc": "Personal 1:1 guidance and ongoing follow-up even after graduation.",
+        "items": [
+          "1:1 sessions",
+          "Post-graduation follow-up",
+          "Career mentorship",
+          "Hiring opportunities"
+        ],
+        "color": "emerald"
+      }
+    ],
+    "introVideoEyebrow": "About us",
+    "introVideoPoints": [
+      "Practical courses with real projects",
+      "1:1 personal follow-up, even after graduation",
+      "Certified diplomas and hiring opportunities"
+    ]
   },
   "courses": {
     "title": "Courses",

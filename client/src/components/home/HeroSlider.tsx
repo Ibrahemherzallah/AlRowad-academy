@@ -48,12 +48,7 @@ export function HeroSlider({ slides, interval = 5500, className }: HeroSliderPro
   if (count === 0) return null;
 
   return (
-    <div
-      className={cn('absolute inset-0 overflow-hidden', className)}
-      onMouseEnter={() => setPaused(true)}
-      onMouseLeave={() => setPaused(false)}
-      aria-roledescription="carousel"
-    >
+    <div className={cn('absolute inset-0 overflow-hidden', className)} onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} aria-roledescription="carousel">
       {/* Slides */}
       <AnimatePresence mode="sync">
         <motion.div
@@ -86,7 +81,10 @@ export function HeroSlider({ slides, interval = 5500, className }: HeroSliderPro
             aria-label="Previous slide"
             className="group absolute start-4 top-1/2 z-10 hidden -translate-y-1/2 place-items-center rounded-full border border-border/60 bg-background/60 p-2 backdrop-blur transition-colors hover:bg-background/90 md:grid"
           >
-            <ChevronLeft className="size-5" />
+            {
+              isRtl ? <ChevronRight className="size-5" />
+                  : <ChevronLeft className="size-5" />
+            }
           </button>
           <button
             type="button"
@@ -94,7 +92,10 @@ export function HeroSlider({ slides, interval = 5500, className }: HeroSliderPro
             aria-label="Next slide"
             className="group absolute end-4 top-1/2 z-10 hidden -translate-y-1/2 place-items-center rounded-full border border-border/60 bg-background/60 p-2 backdrop-blur transition-colors hover:bg-background/90 md:grid"
           >
-            <ChevronRight className="size-5" />
+            {
+              isRtl ? <ChevronLeft className="size-5" />
+                  : <ChevronRight className="size-5" />
+            }
           </button>
 
           {/* Dots */}

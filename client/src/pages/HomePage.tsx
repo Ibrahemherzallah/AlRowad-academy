@@ -7,9 +7,15 @@ import { Button } from '@/components/ui/button';
 import { CourseCard } from '@/components/courses/CourseCard';
 import { CourseGridSkeleton } from '@/components/courses/CourseCardSkeleton';
 import { HeroSlider, type HeroSlide } from '@/components/home/HeroSlider';
+import { ProvideMarquee } from '@/components/home/ProvideMarquee';
+import { IntroVideoSection } from '@/components/home/IntroVideoSection';
+import { WhatWeProvideSection } from '@/components/home/WhatWeProvideSection';
+import { TestimonialsSection } from '@/components/home/TestimonialsSection';
+import { LatestNewsSection } from '@/components/home/LatestNewsSection';
+import { Reveal } from '@/components/ui/reveal';
 import { fetchCourses } from '@/lib/courses.api';
 import type { Course } from '@/lib/types';
-
+import { WhatsAppFloat } from '../components/home/WhatsAppFloat.tsx'
 /**
  * Hero background images. Swap these URLs for your own academy photography
  * (classrooms, workshops, students) — ideally 1920×1080, optimized. The
@@ -104,9 +110,18 @@ export default function HomePage() {
       </div>
     </section>
 
+    {/* What-we-provide marquee strip */}
+    <ProvideMarquee />
+
+    {/* Intro video */}
+    <IntroVideoSection />
+
+    {/* What we provide (services / courses) */}
+    <WhatWeProvideSection />
+
     {/* Featured courses */}
     <section className="container py-16">
-      <div className="mb-8 flex items-end justify-between">
+      <Reveal className="mb-8 flex items-end justify-between">
         <div>
           <h2 className="text-2xl font-extrabold md:text-3xl">{t('home.featuredCourses')}</h2>
           <p className="mt-1 text-muted-foreground">{t('home.whyUs')}</p>
@@ -117,7 +132,7 @@ export default function HomePage() {
             <ArrowLeft className="size-4 rtl:rotate-0 ltr:rotate-180" />
           </Link>
         </Button>
-      </div>
+      </Reveal>
 
       {loading ? (
         <CourseGridSkeleton count={3} />
@@ -129,6 +144,14 @@ export default function HomePage() {
         </div>
       ) : null}
     </section>
+
+    {/* Testimonials */}
+    <TestimonialsSection />
+
+    {/* Latest news */}
+    <LatestNewsSection />
+
+    <WhatsAppFloat />
     </>
   );
 }
