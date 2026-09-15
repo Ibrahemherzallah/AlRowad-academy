@@ -3,6 +3,12 @@ import type { Config } from 'tailwindcss';
 const config: Config = {
   darkMode: ['class'],
   content: ['./index.html', './src/**/*.{ts,tsx}'],
+  safelist: [
+    // Department card accent classes are composed from a color key, so make
+    // sure these dynamic families survive JIT purging.
+    { pattern: /(bg|text|from|to|shadow)-(violet|blue|amber|emerald|fuchsia|cyan|orange|teal)-(400|500)/ },
+    { pattern: /(bg|text|from|to|shadow)-(violet|blue|amber|emerald|fuchsia|cyan|orange|teal)-500\/10/ },
+  ],
   theme: {
     container: {
       center: true,
@@ -73,11 +79,21 @@ const config: Config = {
         shimmer: {
           '100%': { transform: 'translateX(100%)' },
         },
+        marquee: {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(-50%)' },
+        },
+        'marquee-rtl': {
+          from: { transform: 'translateX(0)' },
+          to: { transform: 'translateX(50%)' },
+        },
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         shimmer: 'shimmer 1.5s infinite',
+        marquee: 'marquee var(--marquee-duration, 40s) linear infinite',
+        'marquee-rtl': 'marquee-rtl var(--marquee-duration, 40s) linear infinite',
       },
     },
   },
