@@ -29,7 +29,8 @@
     "react-router-dom": "^7.1.1",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
-    "zustand": "^5.0.2"
+    "zustand": "^5.0.2",
+    "react-phone-input-2": "^2.15.1"
   },
   "devDependencies": {
     "@types/node": "^22.10.5",

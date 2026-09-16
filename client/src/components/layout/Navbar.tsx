@@ -21,6 +21,7 @@ const NAV_KEYS = [
   { to: '/courses', key: 'nav.courses' },
   { to: '/services', key: 'nav.services' },
   { to: '/about', key: 'nav.about' },
+  { to: '/contact', key: 'nav.contact' },
 ] as const;
 
 export function Navbar() {
@@ -90,7 +91,7 @@ export function Navbar() {
               <DropdownMenuContent align="end" className="w-56">
                 <div className="px-2 py-1.5 text-sm">
                   <p className="font-semibold">{user.name}</p>
-                  <p className="truncate text-xs text-muted-foreground">{user.email}</p>
+                  <p className="truncate text-xs text-muted-foreground" dir="ltr">{user.phone}</p>
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => navigate('/dashboard')}>

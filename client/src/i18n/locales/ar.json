@@ -10,7 +10,6 @@
     "confirm": "تأكيد",
     "search": "بحث",
     "viewAll": "عرض الكل",
-    "contactNow": "تواصل الان",
     "readMore": "اقرأ المزيد",
     "comingSoon": "قريباً",
     "free": "مجاني",
@@ -26,7 +25,8 @@
     "register": "إنشاء حساب",
     "dashboard": "لوحة التحكم",
     "logout": "تسجيل الخروج",
-    "admin": "لوحة الإدارة"
+    "admin": "لوحة الإدارة",
+    "contact": "تواصل معنا"
   },
   "home": {
     "heroTitle": "طوّر دخلك بمهارات حقيقية",
@@ -218,7 +218,25 @@
     "submitRegister": "إنشاء الحساب",
     "resetTitle": "إعادة تعيين كلمة المرور",
     "sendReset": "إرسال رابط الاستعادة",
-    "resetSent": "إذا كان الحساب موجوداً، تم إرسال رابط الاستعادة."
+    "resetSent": "إذا كان الحساب موجوداً، تم إرسال رابط الاستعادة.",
+    "loginSubtitle": "أهلاً بعودتك! سجّل الدخول لمتابعة تعلّمك.",
+    "registerSubtitle": "أنشئ حسابك وابدأ رحلتك نحو مهارات تزيد دخلك.",
+    "orContinue": "أو",
+    "passwordPlaceholder": "٨ أحرف على الأقل",
+    "creating": "جارٍ الإنشاء...",
+    "loggingIn": "جارٍ الدخول...",
+    "loginSuccess": "تم تسجيل الدخول بنجاح",
+    "registerSuccess": "تم إنشاء حسابك بنجاح، أهلاً بك!",
+    "invalidCredentials": "البريد/الهاتف أو كلمة المرور غير صحيحة",
+    "emailOrPhoneTaken": "البريد الإلكتروني أو رقم الهاتف مستخدم مسبقاً",
+    "genericError": "تعذّر إتمام العملية، حاول مرة أخرى",
+    "agreeTerms": "بإنشائك حساباً فإنك توافق على شروط الاستخدام",
+    "namePlaceholder": "اكتب اسمك الكامل",
+    "emailPlaceholder": "name@example.com",
+    "cityPlaceholder": "مثال: الخليل",
+    "referralPlaceholder": "إن وُجد",
+    "identifierPlaceholder": "name@example.com أو +9705...",
+    "phoneTaken": "رقم الهاتف مستخدم مسبقاً"
   },
   "dashboard": {
     "welcome": "أهلاً",
@@ -250,5 +268,35 @@
     "quickLinks": "روابط سريعة",
     "contact": "تواصل معنا",
     "followUs": "تابعنا"
+  },
+  "contact": {
+    "title": "تواصل معنا",
+    "subtitle": "عندك سؤال أو استفسار؟ فريقنا جاهز لمساعدتك.",
+    "name": "الاسم الكامل",
+    "email": "البريد الإلكتروني",
+    "phone": "رقم الهاتف (اختياري)",
+    "subject": "الموضوع",
+    "message": "رسالتك",
+    "messagePlaceholder": "اكتب رسالتك هنا...",
+    "send": "إرسال الرسالة",
+    "sending": "جارٍ الإرسال...",
+    "success": "تم استلام رسالتك، سنعود إليك قريباً 🎉",
+    "error": "تعذّر إرسال الرسالة، حاول مرة أخرى",
+    "infoTitle": "معلومات التواصل",
+    "infoSubtitle": "يمكنك الوصول إلينا عبر أي من الوسائل التالية.",
+    "emailLabel": "البريد الإلكتروني",
+    "phoneLabel": "الهاتف / واتساب",
+    "addressLabel": "الموقع",
+    "address": "الخليل، فلسطين",
+    "hoursLabel": "ساعات العمل",
+    "hours": "السبت - الخميس، ٩ص - ٦م"
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "nameShort": "الاسم قصير جداً",
+    "emailInvalid": "بريد إلكتروني غير صالح",
+    "phoneInvalid": "رقم هاتف غير صالح",
+    "passwordShort": "كلمة المرور يجب أن تكون ٨ أحرف على الأقل",
+    "messageShort": "الرسالة قصيرة جداً"
   }
 }

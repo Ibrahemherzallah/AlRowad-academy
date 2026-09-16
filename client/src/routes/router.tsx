@@ -4,15 +4,22 @@ import { ProtectedRoute } from './ProtectedRoute';
 import HomePage from '@/pages/HomePage';
 import CoursesPage from '@/pages/CoursesPage';
 import CourseDetailPage from '@/pages/CourseDetailPage';
+import ContactPage from '@/pages/ContactPage';
+import LoginPage from '@/pages/LoginPage';
+import RegisterPage from '@/pages/RegisterPage';
 import PlaceholderPage from '@/pages/PlaceholderPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
 /**
- * Route table. Public pages render in RootLayout. Student/admin areas are
- * gated by ProtectedRoute and get their own layouts in later modules.
- * Placeholder pages are swapped out as feature modules land.
+ * Route table. Public pages render in RootLayout (navbar + footer).
+ * Auth pages (login/register) use their own full-screen AuthLayout, so they
+ * sit OUTSIDE RootLayout. Student/admin areas are gated by ProtectedRoute.
  */
 export const router = createBrowserRouter([
+  // Full-screen auth pages (no navbar/footer)
+  { path: '/login', element: <LoginPage /> },
+  { path: '/register', element: <RegisterPage /> },
+
   {
     path: '/',
     element: <RootLayout />,
@@ -20,10 +27,9 @@ export const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: 'courses', element: <CoursesPage /> },
       { path: 'courses/:slug', element: <CourseDetailPage /> },
+      { path: 'contact', element: <ContactPage /> },
       { path: 'services', element: <PlaceholderPage titleKey="nav.services" /> },
       { path: 'about', element: <PlaceholderPage titleKey="nav.about" /> },
-      { path: 'login', element: <PlaceholderPage titleKey="auth.loginTitle" /> },
-      { path: 'register', element: <PlaceholderPage titleKey="auth.registerTitle" /> },
       { path: 'forgot-password', element: <PlaceholderPage titleKey="auth.resetTitle" /> },
       { path: 'reset-password', element: <PlaceholderPage titleKey="auth.resetTitle" /> },
 

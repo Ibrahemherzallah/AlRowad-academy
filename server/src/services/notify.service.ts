@@ -27,12 +27,12 @@ export async function sendEmail(to: string, subject: string, html: string): Prom
 
 /** Convenience: notify a student across all channels. */
 export async function notifyStudent(
-  student: { phone: string; email: string },
+  student: { phone: string; email?: string },
   opts: { whatsapp?: string; emailSubject?: string; emailHtml?: string },
 ): Promise<void> {
   const tasks: Promise<void>[] = [];
   if (opts.whatsapp) tasks.push(sendWhatsApp(student.phone, opts.whatsapp));
-  if (opts.emailSubject && opts.emailHtml)
+  if (student.email && opts.emailSubject && opts.emailHtml)
     tasks.push(sendEmail(student.email, opts.emailSubject, opts.emailHtml));
   await Promise.allSettled(tasks);
 }

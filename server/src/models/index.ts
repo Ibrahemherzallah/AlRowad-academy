@@ -8,3 +8,4 @@ export { Session, type ISession } from './Session.js';
 export { VideoProgress, type IVideoProgress } from './VideoProgress.js';
 export { Certificate, type ICertificate } from './Certificate.js';
 export { Settings, getSettings, type ISettings } from './Settings.js';
+export { ContactMessage, type IContactMessage } from './ContactMessage';

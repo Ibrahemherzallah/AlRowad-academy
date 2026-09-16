@@ -10,7 +10,6 @@
     "confirm": "Confirm",
     "search": "Search",
     "viewAll": "View all",
-    "contactNow": "Contact Now",
     "readMore": "Read more",
     "comingSoon": "Coming soon",
     "free": "Free",
@@ -26,7 +25,8 @@
     "register": "Sign up",
     "dashboard": "Dashboard",
     "logout": "Log out",
-    "admin": "Admin"
+    "admin": "Admin",
+    "contact": "Contact"
   },
   "home": {
     "heroTitle": "Grow your income with real skills",
@@ -218,7 +218,25 @@
     "submitRegister": "Create account",
     "resetTitle": "Reset password",
     "sendReset": "Send reset link",
-    "resetSent": "If an account exists, a reset link has been sent."
+    "resetSent": "If an account exists, a reset link has been sent.",
+    "loginSubtitle": "Welcome back! Log in to continue learning.",
+    "registerSubtitle": "Create your account and start building income-growing skills.",
+    "orContinue": "or",
+    "passwordPlaceholder": "At least 8 characters",
+    "creating": "Creating...",
+    "loggingIn": "Logging in...",
+    "loginSuccess": "Logged in successfully",
+    "registerSuccess": "Your account has been created — welcome!",
+    "invalidCredentials": "Email/phone or password is incorrect",
+    "emailOrPhoneTaken": "Email or phone is already registered",
+    "genericError": "Couldn't complete the request, please try again",
+    "agreeTerms": "By creating an account you agree to the Terms of Use",
+    "namePlaceholder": "Enter your full name",
+    "emailPlaceholder": "name@example.com",
+    "cityPlaceholder": "e.g. Hebron",
+    "referralPlaceholder": "If any",
+    "identifierPlaceholder": "name@example.com or +9705...",
+    "phoneTaken": "Phone is already registered"
   },
   "dashboard": {
     "welcome": "Welcome",
@@ -250,5 +268,35 @@
     "quickLinks": "Quick links",
     "contact": "Contact",
     "followUs": "Follow us"
+  },
+  "contact": {
+    "title": "Contact us",
+    "subtitle": "Have a question? Our team is ready to help.",
+    "name": "Full name",
+    "email": "Email",
+    "phone": "Phone (optional)",
+    "subject": "Subject",
+    "message": "Your message",
+    "messagePlaceholder": "Write your message here...",
+    "send": "Send message",
+    "sending": "Sending...",
+    "success": "Your message was received — we'll get back to you soon 🎉",
+    "error": "Couldn't send your message, please try again",
+    "infoTitle": "Contact information",
+    "infoSubtitle": "Reach us through any of the following.",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone / WhatsApp",
+    "addressLabel": "Location",
+    "address": "Hebron, Palestine",
+    "hoursLabel": "Working hours",
+    "hours": "Sat - Thu, 9am - 6pm"
+  },
+  "validation": {
+    "required": "This field is required",
+    "nameShort": "Name is too short",
+    "emailInvalid": "Invalid email",
+    "phoneInvalid": "Invalid phone number",
+    "passwordShort": "Password must be at least 8 characters",
+    "messageShort": "Message is too short"
   }
 }

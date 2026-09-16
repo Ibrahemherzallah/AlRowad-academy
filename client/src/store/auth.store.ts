@@ -6,7 +6,7 @@ interface AuthState {
   user: User | null;
   status: 'idle' | 'loading' | 'authenticated' | 'unauthenticated';
   bootstrap: () => Promise<void>;
-  login: (identifier: string, password: string) => Promise<void>;
+  login: (phone: string, password: string) => Promise<void>;
   register: (payload: RegisterPayload) => Promise<void>;
   logout: () => Promise<void>;
   setUser: (user: User | null) => void;
@@ -15,7 +15,6 @@ interface AuthState {
 export interface RegisterPayload {
   name: string;
   phone: string;
-  email: string;
   password: string;
   city?: string;
   referralCode?: string;
@@ -39,8 +38,8 @@ export const useAuthStore = create<AuthState>((set) => ({
     }
   },
 
-  login: async (identifier, password) => {
-    const { data } = await api.post('/auth/login', { identifier, password });
+  login: async (phone, password) => {
+    const { data } = await api.post('/auth/login', { phone, password });
     const { user, accessToken } = unwrap<{ user: User; accessToken: string }>(data);
     setAccessToken(accessToken);
     set({ user, status: 'authenticated' });
