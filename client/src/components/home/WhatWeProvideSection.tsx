@@ -133,7 +133,7 @@ export function WhatWeProvideSection() {
 
       <Reveal className="mt-12 flex justify-center">
         <Button asChild size="lg">
-          <Link to="/courses">
+          <Link to="/contact">
             {t('common.contactNow')}
             <ArrowLeft className="size-4 rtl:rotate-0 ltr:rotate-180" />
           </Link>

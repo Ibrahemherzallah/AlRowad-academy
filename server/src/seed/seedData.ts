@@ -383,11 +383,11 @@ export const SEED_COURSES: SeedCourse[] = [
 
 /** Sample students (password for all: Student@123). */
 export const SEED_STUDENTS = [
-  { name: 'يوسف عابد', email: 'yousef@example.com', phone: '+970591000001', city: 'الخليل' },
-  { name: 'مريم صالح', email: 'mariam@example.com', phone: '+970591000002', city: 'رام الله' },
-  { name: 'خالد نصار', email: 'khaled@example.com', phone: '+970591000003', city: 'نابلس' },
-  { name: 'رنا حدّاد', email: 'rana@example.com', phone: '+962790000004', city: 'عمّان' },
-  { name: 'عمر شاهين', email: 'omar@example.com', phone: '+970591000005', city: 'بيت لحم' },
+  { name: 'يوسف عابد', phone: '+970591000001', city: 'الخليل' },
+  { name: 'مريم صالح', phone: '+970591000002', city: 'رام الله' },
+  { name: 'خالد نصار', phone: '+970591000003', city: 'نابلس' },
+  { name: 'رنا حدّاد', phone: '+962790000004', city: 'عمّان' },
+  { name: 'عمر شاهين', phone: '+970591000005', city: 'بيت لحم' },
 ];
 
 /** Marketing offers / coupons. */

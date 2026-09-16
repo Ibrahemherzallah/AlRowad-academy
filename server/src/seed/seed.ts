@@ -7,7 +7,7 @@ import { Offer } from '../models/Offer.js';
 import { getSettings } from '../models/Settings.js';
 import { ensureLoyaltyAccount, awardEnrollmentPoints } from '../services/loyalty.service.js';
 import { logger } from '../utils/logger.js';
-import { SEED_COURSES, SEED_STUDENTS, SEED_OFFERS } from './seedData.js';
+import { SEED_COURSES, SEED_STUDENTS, SEED_OFFERS } from './seedData';
 
 /** Pass --fresh to wipe existing collections before seeding. */
 const FRESH = process.argv.includes('--fresh');
@@ -30,12 +30,11 @@ async function seed() {
   await getSettings();
 
   /* ---------- Admin ---------- */
-  const adminEmail = 'admin@rawad.academy';
-  let admin = await User.findOne({ email: adminEmail });
+  const adminPhone = '+970590000000';
+  let admin = await User.findOne({ phone: adminPhone });
   if (!admin) {
     admin = await User.create({
       name: 'مدير الأكاديمية',
-      email: adminEmail,
       phone: '+970590000000',
       passwordHash: await hashPassword('Admin@12345'),
       role: 'admin',
@@ -43,7 +42,7 @@ async function seed() {
       city: 'الخليل',
     });
     await ensureLoyaltyAccount(admin._id.toString());
-    logger.info(`👤 Admin created: ${adminEmail} / Admin@12345`);
+    logger.info(`👤 Admin created: ${adminPhone} / Admin@12345`);
   } else {
     logger.info('👤 Admin already exists');
   }
@@ -88,11 +87,10 @@ async function seed() {
   /* ---------- Students ---------- */
   const students: any[] = [];
   for (const s of SEED_STUDENTS) {
-    let student = await User.findOne({ email: s.email });
+    let student = await User.findOne({ phone: s.phone });
     if (!student) {
       student = await User.create({
         name: s.name,
-        email: s.email,
         phone: s.phone,
         city: s.city,
         passwordHash: await hashPassword('Student@123'),
@@ -100,7 +98,7 @@ async function seed() {
         isVerified: true,
       });
       await ensureLoyaltyAccount(student._id.toString());
-      logger.info(`🧑‍🎓 Student seeded: ${s.email} / Student@123`);
+      logger.info(`🧑‍🎓 Student seeded: ${s.phone} / Student@123`);
     }
     students.push(student);
   }
@@ -154,8 +152,8 @@ async function seed() {
   }
 
   logger.info('✅ Seed complete');
-  logger.info('   Admin:   admin@rawad.academy / Admin@12345');
-  logger.info('   Student: yousef@example.com / Student@123');
+  logger.info('   Admin:   +970590000000 / Admin@12345');
+  logger.info('   Student: +970591000001 / Student@123');
 
   await disconnectDB();
   await mongoose.connection.close();

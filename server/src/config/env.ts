@@ -34,7 +34,9 @@ const parsed = envSchema.safeParse(process.env);
 if (!parsed.success) {
   // eslint-disable-next-line no-console
   console.error('❌ Invalid environment variables:', parsed.error.flatten().fieldErrors);
-  process.exit(1);
+  // `throw` is always recognized by TS as `never`, so `parsed.data` below is
+  // correctly narrowed to defined even if node types aren't fully resolved.
+  throw new Error('Invalid environment variables');
 }
 
 export const env = parsed.data;

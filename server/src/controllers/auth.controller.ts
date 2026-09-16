@@ -1,22 +1,15 @@
 import crypto from 'node:crypto';
 import type { Request, Response } from 'express';
-import { User, hashPassword } from '../models/User.js';
-import { ensureLoyaltyAccount } from '../services/loyalty.service.js';
-import { notifyStudent } from '../services/notify.service.js';
-import {
-  signAccessToken,
-  signRefreshToken,
-  verifyRefreshToken,
-} from '../utils/tokens.js';
-import { ApiError } from '../utils/apiError.js';
-import { catchAsync } from '../utils/catchAsync.js';
-import { ok } from '../utils/apiResponse.js';
-import { env } from '../config/env.js';
-import type { AuthedRequest } from '../middleware/auth.js';
-import type {
-  RegisterInput,
-  LoginInput,
-} from '../validators/auth.validators.js';
+import { User, hashPassword } from '@/models';
+import { ensureLoyaltyAccount } from '@/services/loyalty.service';
+import { notifyStudent } from '@/services/notify.service';
+import { signAccessToken, signRefreshToken, verifyRefreshToken } from '@/utils/tokens';
+import { ApiError } from '@/utils/apiError';
+import { catchAsync } from '@/utils/catchAsync';
+import { ok } from '@/utils/apiResponse';
+import { env } from '@/config/env';
+import type { AuthedRequest } from '@/middleware/auth';
+import type { RegisterInput, LoginInput } from '@/validators/auth.validators';
 
 const REFRESH_COOKIE = 'refreshToken';
 
@@ -43,10 +36,10 @@ async function issueTokens(res: Response, user: { id: string; role: 'student' | 
 
 /** POST /api/auth/register */
 export const register = catchAsync(async (req: Request, res: Response) => {
-  const { name, phone, email, password, city, referralCode } = req.body as RegisterInput;
+  const { name, phone, password, city, referralCode } = req.body as RegisterInput;
 
-  const existing = await User.findOne({ $or: [{ email }, { phone }] });
-  if (existing) throw ApiError.conflict('Email or phone already registered');
+  const existing = await User.findOne({ phone });
+  if (existing) throw ApiError.conflict('Phone already registered');
 
   let referredBy = null;
   if (referralCode) {
@@ -55,7 +48,7 @@ export const register = catchAsync(async (req: Request, res: Response) => {
   }
 
   const passwordHash = await hashPassword(password);
-  const user = await User.create({ name, phone, email, passwordHash, city, referredBy });
+  const user = await User.create({ name, phone, passwordHash, city, referredBy });
 
   await ensureLoyaltyAccount(user._id.toString());
 
@@ -72,15 +65,11 @@ export const register = catchAsync(async (req: Request, res: Response) => {
   return ok(res, { user, accessToken }, 201);
 });
 
-/** POST /api/auth/login — identifier may be email or phone. */
+/** POST /api/auth/login — sign in with phone + password. */
 export const login = catchAsync(async (req: Request, res: Response) => {
-  const { identifier, password } = req.body as LoginInput;
+  const { phone, password } = req.body as LoginInput;
 
-  const query = identifier.includes('@')
-    ? { email: identifier.toLowerCase() }
-    : { phone: identifier };
-
-  const user = await User.findOne(query).select('+passwordHash');
+  const user = await User.findOne({ phone }).select('+passwordHash');
   if (!user) throw ApiError.unauthorized('Invalid credentials');
 
   const matches = await user.comparePassword(password);
@@ -138,15 +127,13 @@ export const me = catchAsync(async (req: AuthedRequest, res: Response) => {
 
 /**
  * POST /api/auth/forgot-password
- * Always responds 200 (no user enumeration). Sends a reset token if found.
+ * Always responds 200 (no user enumeration). Sends a reset link over WhatsApp
+ * if the phone matches an account.
  */
 export const forgotPassword = catchAsync(async (req: Request, res: Response) => {
-  const { identifier } = req.body as { identifier: string };
-  const query = identifier.includes('@')
-    ? { email: identifier.toLowerCase() }
-    : { phone: identifier };
+  const { phone } = req.body as { phone: string };
 
-  const user = await User.findOne(query);
+  const user = await User.findOne({ phone });
   if (user) {
     const rawToken = crypto.randomBytes(32).toString('hex');
     user.passwordResetToken = crypto.createHash('sha256').update(rawToken).digest('hex');
@@ -156,8 +143,6 @@ export const forgotPassword = catchAsync(async (req: Request, res: Response) => 
     const resetUrl = `${env.CLIENT_URL}/reset-password?token=${rawToken}`;
     await notifyStudent(user, {
       whatsapp: `🔐 رابط إعادة تعيين كلمة المرور (صالح لساعة): ${resetUrl}`,
-      emailSubject: 'إعادة تعيين كلمة المرور — اكاديمية الرواد',
-      emailHtml: `<p>لإعادة تعيين كلمة المرور اضغط الرابط التالي (صالح لمدة ساعة):</p><p><a href="${resetUrl}">${resetUrl}</a></p>`,
     });
   }
 

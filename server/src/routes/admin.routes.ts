@@ -1,12 +1,10 @@
 import { Router } from 'express';
 import * as courseController from '../controllers/course.controller.js';
-import { authenticate, requireRole } from '../middleware/auth.js';
-import { validate } from '../middleware/validate.js';
-import {
-  createCourseSchema,
-  updateCourseSchema,
-  idParamSchema,
-} from '../validators/course.validators.js';
+import * as contactController from '../controllers/contact.controller.js';
+import { authenticate, requireRole } from '@/middleware/auth';
+import { validate } from '@/middleware/validate';
+import { createCourseSchema, updateCourseSchema, idParamSchema } from '@/validators/course.validators';
+import { listContactQuerySchema, updateContactSchema } from '@/validators/contact.validators';
 
 const router = Router();
 
@@ -23,6 +21,15 @@ router.patch(
   courseController.updateCourse,
 );
 router.delete('/courses/:id', validate({ params: idParamSchema }), courseController.deleteCourse);
+
+/* Contact messages */
+router.get('/contact', validate({ query: listContactQuerySchema }), contactController.adminListContact);
+router.get('/contact/unread-count', contactController.adminUnreadCount);
+router.patch(
+  '/contact/:id',
+  validate({ params: idParamSchema, body: updateContactSchema }),
+  contactController.adminUpdateContact,
+);
 
 // Later modules mount: /students, /enrollments, /offers, /loyalty, /sessions,
 // /services, /notifications, /cms, /reports
