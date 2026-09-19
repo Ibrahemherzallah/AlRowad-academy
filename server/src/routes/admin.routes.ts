@@ -9,17 +9,17 @@ import {
   createCourseSchema,
   updateCourseSchema,
   idParamSchema,
-} from '@/validators/course.validators';
+} from '@/validators/course.validators.js';
 import {
   listContactQuerySchema,
   updateContactSchema,
-} from '@/validators/contact.validators';
+} from '@/validators/contact.validators.js';
 import {
   createTeacherSchema,
   updateTeacherSchema,
   connectStudentSchema,
   addPaymentSchema,
-} from '@/validators/adminUsers.validators';
+} from '@/validators/adminUsers.validators.js';
 
 const router = Router();
 
