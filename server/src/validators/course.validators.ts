@@ -9,6 +9,7 @@ const lessonSchema = z.object({
   _id: z.string().optional(),
   title: z.string().min(1),
   videoUrl: z.string().default(''),
+  bunnyVideoId: z.string().optional(),
   duration: z.number().min(0).default(0),
   isFreePreview: z.boolean().default(false),
   order: z.number().default(0),

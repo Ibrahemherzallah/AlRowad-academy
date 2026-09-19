@@ -1,15 +1,33 @@
 import { Router } from 'express';
 import * as courseController from '../controllers/course.controller.js';
 import * as contactController from '../controllers/contact.controller.js';
+import * as dashboardController from '../controllers/dashboard.controller.js';
+import * as adminUsers from '../controllers/adminUsers.controller.js';
 import { authenticate, requireRole } from '@/middleware/auth';
 import { validate } from '@/middleware/validate';
-import { createCourseSchema, updateCourseSchema, idParamSchema } from '@/validators/course.validators';
-import { listContactQuerySchema, updateContactSchema } from '@/validators/contact.validators';
+import {
+  createCourseSchema,
+  updateCourseSchema,
+  idParamSchema,
+} from '@/validators/course.validators';
+import {
+  listContactQuerySchema,
+  updateContactSchema,
+} from '@/validators/contact.validators';
+import {
+  createTeacherSchema,
+  updateTeacherSchema,
+  connectStudentSchema,
+  addPaymentSchema,
+} from '@/validators/adminUsers.validators';
 
 const router = Router();
 
 // Every admin route requires an authenticated admin.
 router.use(authenticate, requireRole('admin'));
+
+/* Dashboard overview */
+router.get('/dashboard', dashboardController.adminOverview);
 
 /* Courses */
 router.get('/courses', courseController.adminListCourses);
@@ -21,6 +39,30 @@ router.patch(
   courseController.updateCourse,
 );
 router.delete('/courses/:id', validate({ params: idParamSchema }), courseController.deleteCourse);
+router.get('/courses/:id/stats', validate({ params: idParamSchema }), adminUsers.courseStats);
+
+/* Teachers */
+router.get('/teachers', adminUsers.listTeachers);
+router.post('/teachers', validate({ body: createTeacherSchema }), adminUsers.createTeacher);
+router.patch(
+  '/teachers/:id',
+  validate({ params: idParamSchema, body: updateTeacherSchema }),
+  adminUsers.updateTeacher,
+);
+router.post('/teachers/:id/settle', validate({ params: idParamSchema }), adminUsers.settleCommissions);
+
+/* Students */
+router.get('/students', adminUsers.listStudents);
+
+/* Enrollments & payments */
+router.get('/enrollments', adminUsers.listEnrollments);
+router.get('/enrollments/price-preview', adminUsers.pricePreview);
+router.post('/enrollments/connect', validate({ body: connectStudentSchema }), adminUsers.connectStudent);
+router.post(
+  '/enrollments/:id/payment',
+  validate({ params: idParamSchema, body: addPaymentSchema }),
+  adminUsers.addPayment,
+);
 
 /* Contact messages */
 router.get('/contact', validate({ query: listContactQuerySchema }), contactController.adminListContact);

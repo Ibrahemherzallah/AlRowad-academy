@@ -1,5 +1,5 @@
 import mongoose, { Schema, model, type Document, type Types } from 'mongoose';
-import type { EnrollmentStatus, PaymentMethod, PaymentStatus } from '../types/index.js';
+import type { EnrollmentStatus, PaymentMethod, PaymentStatus } from './index';
 
 export interface IInstallment {
   dueDate: Date;
@@ -28,7 +28,11 @@ export interface IEnrollment extends Document {
   accessEndDate?: Date | null;
   installments: IInstallment[];
   offersApplied: IAppliedOffer[];
-  loyaltyAwarded: boolean; // guard so points are granted once
+  loyaltyAwarded: boolean; // guard so enrolment points are granted once
+  // Reservation & attribution
+  invitedVia?: Types.ObjectId | null; // InviteLink used to join
+  scheduleId?: Types.ObjectId | null; // which class/section the student picked
+  commissionedAmount: number; // sum of student payments already commissioned
   createdAt: Date;
   updatedAt: Date;
 }
@@ -75,6 +79,9 @@ const enrollmentSchema = new Schema<IEnrollment>(
       default: [],
     },
     loyaltyAwarded: { type: Boolean, default: false },
+    invitedVia: { type: Schema.Types.ObjectId, ref: 'InviteLink', default: null },
+    scheduleId: { type: Schema.Types.ObjectId, ref: 'ClassSchedule', default: null },
+    commissionedAmount: { type: Number, default: 0, min: 0 },
   },
   { timestamps: true },
 );

@@ -1,12 +1,12 @@
 import type { Request, Response } from 'express';
 import type { FilterQuery } from 'mongoose';
-import { Course, type ICourse } from '../models/Course.js';
-import { Enrollment } from '../models/Enrollment.js';
-import { ApiError } from '../utils/apiError.js';
-import { catchAsync } from '../utils/catchAsync.js';
-import { ok } from '../utils/apiResponse.js';
-import type { ListCoursesQuery } from '../validators/course.validators.js';
-import type { AuthedRequest } from '../middleware/auth.js';
+import { Course, type ICourse } from '@/models';
+import { Enrollment } from '@/models';
+import { ApiError } from '@/utils/apiError';
+import { catchAsync } from '@/utils/catchAsync';
+import { ok } from '@/utils/apiResponse';
+import type { ListCoursesQuery } from '@/validators/course.validators';
+import type { AuthedRequest } from '@/middleware/auth';
 
 /** Strip lesson videoUrls from a course before returning to the public. */
 function publicCourse(course: ICourse) {
