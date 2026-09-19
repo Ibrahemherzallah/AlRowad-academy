@@ -1,8 +1,8 @@
 import { Outlet, useLocation } from 'react-router-dom';
 import { AnimatePresence } from 'framer-motion';
-import { Navbar } from './Navbar';
-import { Footer } from './Footer';
-import { PageTransition } from './PageTransition';
+import { Navbar } from '../layout/Navbar';
+import { Footer } from '../layout/Footer';
+import { PageTransition } from '../layout/PageTransition';
 import { WhatsAppFloat } from './WhatsAppFloat.tsx';
 
 /** Public site shell: navbar + animated content + footer. */

@@ -6,8 +6,8 @@ interface AuthState {
   user: User | null;
   status: 'idle' | 'loading' | 'authenticated' | 'unauthenticated';
   bootstrap: () => Promise<void>;
-  login: (phone: string, password: string) => Promise<void>;
-  register: (payload: RegisterPayload) => Promise<void>;
+  login: (phone: string, password: string) => Promise<User>;
+  register: (payload: RegisterPayload) => Promise<User>;
   logout: () => Promise<void>;
   setUser: (user: User | null) => void;
 }
@@ -43,6 +43,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     const { user, accessToken } = unwrap<{ user: User; accessToken: string }>(data);
     setAccessToken(accessToken);
     set({ user, status: 'authenticated' });
+    return user;
   },
 
   register: async (payload) => {
@@ -50,6 +51,7 @@ export const useAuthStore = create<AuthState>((set) => ({
     const { user, accessToken } = unwrap<{ user: User; accessToken: string }>(data);
     setAccessToken(accessToken);
     set({ user, status: 'authenticated' });
+    return user;
   },
 
   logout: async () => {

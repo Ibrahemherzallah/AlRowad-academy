@@ -31,3 +31,21 @@ export function requireRole(...roles: Role[]) {
     next();
   };
 }
+
+/**
+ * Populates req.user when a valid access token is present, but does NOT reject
+ * when it's missing/invalid. Used for endpoints that behave differently for
+ * logged-in vs anonymous users (e.g. free-preview videos).
+ */
+export function optionalAuthenticate(req: AuthedRequest, _res: Response, next: NextFunction): void {
+  const header = req.headers.authorization;
+  if (header && header.startsWith('Bearer ')) {
+    try {
+      const payload = verifyAccessToken(header.slice(7));
+      req.user = { id: payload.sub, role: payload.role };
+    } catch {
+      /* ignore — treat as anonymous */
+    }
+  }
+  next();
+}

@@ -1,7 +1,7 @@
 import mongoose, { Schema, model, type Document, type Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { customAlphabet } from 'nanoid';
-import type { Role } from '../types/index.js';
+import type { Role } from './index';
 
 const refCode = customAlphabet('ABCDEFGHJKLMNPQRSTUVWXYZ23456789', 8);
 
@@ -15,6 +15,10 @@ export interface IUser extends Document {
   referralCode: string;
   referredBy?: Types.ObjectId | null;
   loyaltyAccountId?: Types.ObjectId | null;
+  // Teacher-only fields (null/0 for students & admins)
+  bio?: string;
+  specialty?: string;
+  commissionRate?: number; // default 0.10 (10%); admin-adjustable per teacher
   tokenVersion: number;
   isVerified: boolean;
   passwordResetToken?: string | null;
@@ -30,10 +34,13 @@ const userSchema = new Schema<IUser>(
     phone: { type: String, required: true, unique: true, trim: true, index: true },
     passwordHash: { type: String, required: true, select: false },
     city: { type: String, trim: true },
-    role: { type: String, enum: ['student', 'admin'], default: 'student', index: true },
+    role: { type: String, enum: ['student', 'teacher', 'admin'], default: 'student', index: true },
     referralCode: { type: String, unique: true, index: true },
     referredBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
     loyaltyAccountId: { type: Schema.Types.ObjectId, ref: 'LoyaltyAccount', default: null },
+    bio: { type: String, default: '' },
+    specialty: { type: String, default: '' },
+    commissionRate: { type: Number, default: 0.1, min: 0, max: 1 },
     tokenVersion: { type: Number, default: 0 },
     isVerified: { type: Boolean, default: false },
     passwordResetToken: { type: String, default: null, select: false },

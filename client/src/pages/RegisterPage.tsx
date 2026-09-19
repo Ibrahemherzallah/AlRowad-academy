@@ -11,6 +11,7 @@ import { toast } from '@/components/ui/toast';
 import { useAuthStore } from '@/store/auth.store';
 import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 import { extractApiError } from '@/lib/errors';
+import { postAuthDestination } from '@/lib/authRedirect';
 
 interface FormState {
   name: string;
@@ -62,7 +63,7 @@ export default function RegisterPage() {
     if (!validate()) return;
     setLoading(true);
     try {
-      await registerUser({
+      const user = await registerUser({
         name: form.name.trim(),
         phone: form.phone.trim(),
         password: form.password,
@@ -70,7 +71,7 @@ export default function RegisterPage() {
         referralCode: form.referralCode.trim() || undefined,
       });
       toast.success(t('auth.registerSuccess'));
-      navigate(next, { replace: true });
+      navigate(postAuthDestination(user, params.get('next')), { replace: true });
     } catch (err) {
       const code = extractApiError(err);
       toast.error(code === 409 ? t('auth.phoneTaken') : t('auth.genericError'));

@@ -1,4 +1,4 @@
-export type Role = 'student' | 'admin';
+export type Role = 'student' | 'teacher' | 'admin';
 
 export interface User {
   id: string;
@@ -39,12 +39,14 @@ export type CourseStatus = 'draft' | 'published' | 'coming_soon' | 'archived';
 export interface Course {
   _id: string;
   slug: string;
+  teacherId?: string | null;
   title: LocalizedString;
   description: LocalizedString;
   category: string;
   thumbnail?: string;
   instructorName?: string;
   instructorBio?: string;
+  totalHours?: number;
   price: number;
   discountedPrice?: number | null;
   effectivePrice: number;

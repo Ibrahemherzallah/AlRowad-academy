@@ -1,10 +1,11 @@
 import mongoose, { Schema, model, type Document, type Types } from 'mongoose';
-import type { CourseStatus, LocalizedString } from '../types/index.js';
+import type { CourseStatus, LocalizedString } from '@/types';
 
 export interface ILesson {
   _id: Types.ObjectId;
   title: string;
-  videoUrl: string;
+  videoUrl: string; // dev fallback / external URL
+  bunnyVideoId?: string; // Bunny.net Stream video GUID
   duration: number; // seconds
   isFreePreview: boolean;
   order: number;
@@ -35,12 +36,14 @@ export interface IAttachment {
 export interface ICourse extends Document {
   _id: Types.ObjectId;
   slug: string;
+  teacherId?: Types.ObjectId | null; // owning teacher (null for admin-created legacy)
   title: LocalizedString;
   description: LocalizedString;
   category: string;
   thumbnail?: string;
   instructorName?: string;
   instructorBio?: string;
+  totalHours?: number; // total course length in hours (e.g. 40)
   price: number;
   discountedPrice?: number | null;
   installmentOptions: IInstallmentOption[];
@@ -64,6 +67,7 @@ export interface ICourse extends Document {
 const lessonSchema = new Schema<ILesson>({
   title: { type: String, required: true },
   videoUrl: { type: String, default: '' },
+  bunnyVideoId: { type: String, default: '' },
   duration: { type: Number, default: 0 },
   isFreePreview: { type: Boolean, default: false },
   order: { type: Number, default: 0 },
@@ -80,12 +84,14 @@ const localized = { ar: { type: String, default: '' }, en: { type: String, defau
 const courseSchema = new Schema<ICourse>(
   {
     slug: { type: String, required: true, unique: true, lowercase: true, trim: true, index: true },
+    teacherId: { type: Schema.Types.ObjectId, ref: 'User', default: null, index: true },
     title: { type: localized, required: true },
     description: { type: localized, required: true },
     category: { type: String, required: true, index: true },
     thumbnail: { type: String, default: '' },
     instructorName: { type: String, default: '' },
     instructorBio: { type: String, default: '' },
+    totalHours: { type: Number, default: 0, min: 0 },
     price: { type: Number, required: true, min: 0 },
     discountedPrice: { type: Number, default: null, min: 0 },
     installmentOptions: {

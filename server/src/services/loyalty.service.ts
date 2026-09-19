@@ -99,6 +99,76 @@ export async function awardEnrollmentPoints(
   return { account, voucher, thresholdReached };
 }
 
+/**
+ * Award referral points to the inviter when their invited friend joins a
+ * course (+10 by default). Mirrors the threshold→voucher logic of enrollment
+ * points so a referral can also trip the 20-point reward.
+ */
+export async function awardReferralPoints(
+  inviterId: string | Types.ObjectId,
+  friendName: string,
+): Promise<AwardResult> {
+  const settings = await getSettings();
+  if (!settings.loyalty.enabled) {
+    const account = await ensureLoyaltyAccount(inviterId);
+    return { account, thresholdReached: false };
+  }
+
+  const points = settings.loyalty.pointsPerReferral;
+  const account = await ensureLoyaltyAccount(inviterId);
+
+  account.pointsBalance += points;
+  account.lifetimePointsEarned += points;
+  account.history.push({
+    action: 'earned',
+    points,
+    reason: `Referral joined: ${friendName}`,
+    createdAt: new Date(),
+  });
+
+  let voucher: ILoyaltyVoucher | undefined;
+  let thresholdReached = false;
+
+  if (account.pointsBalance >= settings.loyalty.threshold) {
+    thresholdReached = true;
+    const expiresAt = settings.loyalty.voucherExpiryDays
+      ? new Date(Date.now() + settings.loyalty.voucherExpiryDays * 86_400_000)
+      : null;
+    const issued = (await LoyaltyVoucher.create({
+      studentId: account.studentId,
+      discountPercent: settings.loyalty.voucherDiscountPercent,
+      expiresAt,
+    })) as ILoyaltyVoucher;
+    voucher = issued;
+
+    const redeemed = account.pointsBalance;
+    account.pointsBalance = 0;
+    account.history.push({
+      action: 'redeemed',
+      points: -redeemed,
+      reason: `Threshold reached — issued ${issued.discountPercent}% voucher`,
+      createdAt: new Date(),
+    });
+  }
+
+  await account.save();
+
+  const inviter = await User.findById(inviterId).select('phone name');
+  if (inviter) {
+    await notifyStudent(inviter, {
+      whatsapp: `🎉 كسبت ${points} نقاط لأن ${friendName} انضم عبر دعوتك!`,
+    });
+    if (voucher) {
+      await notifyStudent(inviter, {
+        whatsapp: `🏆 وصلت لـ ${settings.loyalty.threshold} نقطة وكسبت قسيمة خصم ${voucher.discountPercent}%. الكود: ${voucher.code}`,
+      });
+    }
+  }
+
+  logger.info(`Loyalty(referral): +${points} to ${inviterId}`);
+  return { account, voucher, thresholdReached };
+}
+
 /** Reverse points on refund (e.g. cancelled enrollment). Balance floors at 0. */
 export async function reversePoints(
   studentId: string | Types.ObjectId,

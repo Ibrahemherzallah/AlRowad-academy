@@ -24,6 +24,13 @@ const envSchema = z.object({
   WHATSAPP_API_KEY: z.string().optional(),
   WHATSAPP_PHONE_ID: z.string().optional(),
 
+  // Bunny.net Stream — video hosting with token-signed playback
+  BUNNY_STREAM_LIBRARY_ID: z.string().optional(),
+  BUNNY_STREAM_API_KEY: z.string().optional(),
+  BUNNY_STREAM_CDN_HOST: z.string().optional(), // e.g. vz-xxxx.b-cdn.net
+  BUNNY_STREAM_TOKEN_KEY: z.string().optional(), // token authentication key
+  BUNNY_SIGNED_URL_TTL: z.coerce.number().default(600), // seconds a play URL is valid
+
   EMAIL_PROVIDER: z.string().default('stub'),
   EMAIL_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().default('no-reply@rawad.academy'),

@@ -8,10 +8,15 @@ export interface ISettings extends Document {
   key: string; // always 'global'
   loyalty: {
     enabled: boolean;
-    pointsPerEnrollment: number; // default 10
-    threshold: number; // default 20
-    voucherDiscountPercent: number; // default 20
+    pointsPerEnrollment: number; // +5 per course taken
+    pointsPerReferral: number; // +10 when an invited friend joins
+    threshold: number; // 20 → voucher
+    voucherDiscountPercent: number; // 20%
     voucherExpiryDays: number | null; // null = no expiry
+  };
+  enrollment: {
+    seatReservationMinPercent: number; // min % to reserve a seat (default 30)
+    defaultTeacherCommissionRate: number; // default 0.10
   };
   featureFlags: {
     referrals: boolean;
@@ -28,10 +33,15 @@ const settingsSchema = new Schema<ISettings>(
     key: { type: String, default: 'global', unique: true },
     loyalty: {
       enabled: { type: Boolean, default: true },
-      pointsPerEnrollment: { type: Number, default: 10 },
+      pointsPerEnrollment: { type: Number, default: 5 },
+      pointsPerReferral: { type: Number, default: 10 },
       threshold: { type: Number, default: 20 },
       voucherDiscountPercent: { type: Number, default: 20 },
       voucherExpiryDays: { type: Number, default: null },
+    },
+    enrollment: {
+      seatReservationMinPercent: { type: Number, default: 30, min: 0, max: 100 },
+      defaultTeacherCommissionRate: { type: Number, default: 0.1, min: 0, max: 1 },
     },
     featureFlags: {
       referrals: { type: Boolean, default: true },

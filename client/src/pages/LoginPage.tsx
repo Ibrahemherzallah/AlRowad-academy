@@ -11,6 +11,7 @@ import { toast } from '@/components/ui/toast';
 import { useAuthStore } from '@/store/auth.store';
 import { useDocumentMeta } from '@/hooks/useDocumentMeta';
 import { extractApiError } from '@/lib/errors';
+import { postAuthDestination } from '@/lib/authRedirect';
 
 export default function LoginPage() {
   const { t } = useTranslation();
@@ -43,9 +44,9 @@ export default function LoginPage() {
     setLoading(true);
     try {
       // Backend treats a non-email identifier as a phone lookup.
-      await login(phone.trim(), password);
+      const user = await login(phone.trim(), password);
       toast.success(t('auth.loginSuccess'));
-      navigate(next, { replace: true });
+      navigate(postAuthDestination(user, params.get('next')), { replace: true });
     } catch (err) {
       const code = extractApiError(err);
       toast.error(code === 401 ? t('auth.invalidCredentials') : t('auth.genericError'));
