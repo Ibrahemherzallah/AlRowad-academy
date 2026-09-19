@@ -3,7 +3,7 @@ import * as teacherController from '../controllers/teacher.controller.js';
 import { authenticate, requireRole } from '@/middleware/auth';
 import { validate } from '@/middleware/validate';
 import { teacherCreateCourseSchema, teacherUpdateCourseSchema, scheduleSchema, updateScheduleSchema, createInviteSchema } from '@/validators/teacher.validators';
-import { idParamSchema } from '@/validators/course.validators';
+import { idParamSchema } from '@/validators/course.validators.js';
 
 const router = Router();
 

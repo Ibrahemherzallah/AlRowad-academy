@@ -6,7 +6,7 @@ import {
   reserveSchema,
   createInviteSchema,
   codeParamSchema,
-} from '../validators/enrollment.validators';
+} from '../validators/enrollment.validators.js';
 
 /* Public invite resolution (no auth) */
 export const inviteRouter = Router();

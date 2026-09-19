@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import * as courseController from '../controllers/course.controller.js';
-import { validate } from '../middleware/validate.js';
+import { validate } from '@/middleware/validate';
 import {
   listCoursesQuerySchema,
   slugParamSchema,
-} from '../validators/course.validators.js';
+} from '@/validators/course.validators.js';
 
 const router = Router();
 
