@@ -1,16 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Clock, ArrowLeft } from 'lucide-react';
+import { Clock, ArrowLeft, GraduationCap, Tag } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLocalized } from '@/hooks/useLocalized';
 import { formatPrice } from '@/lib/utils';
 import type { Course } from '@/lib/types';
 
-function lessonCount(course: Course): number {
-  return course.curriculum?.reduce((sum, s) => sum + (s.lessons?.length ?? 0), 0) ?? 0;
-}
 
 export function CourseCard({ course, index = 0 }: { course: Course; index?: number }) {
   const { t, i18n } = useTranslation();
@@ -46,6 +43,12 @@ export function CourseCard({ course, index = 0 }: { course: Course; index?: numb
             <div className="absolute top-3 start-3 flex gap-2">
               <Badge variant="secondary">{course.category}</Badge>
               {comingSoon && <Badge variant="accent">{t('common.comingSoon')}</Badge>}
+              {hasDiscount && (
+                <Badge className="gap-1 bg-red-500 text-white hover:bg-red-600">
+                  <Tag className="size-3" />
+                  {i18n.language === 'ar' ? 'عرض' : 'Offer'}
+                </Badge>
+              )}
             </div>
           </div>
 
@@ -61,9 +64,14 @@ export function CourseCard({ course, index = 0 }: { course: Course; index?: numb
             <div className="mt-4 flex items-center gap-4 text-xs text-muted-foreground">
               <span className="flex items-center gap-1">
                 <Clock className="size-3.5" />
-                {lessonCount(course)} {i18n.language === 'ar' ? 'درس' : 'lessons'}
+                {course.totalHours} {i18n.language === 'ar' ? 'ساعة' : 'hour'}
               </span>
-              {course.instructorName && <span>· {course.instructorName}</span>}
+              {course.instructorName && (
+                <span className="flex items-center gap-1">
+                  <GraduationCap className="size-3.5" />
+                  {course.instructorName}
+                </span>
+              )}
             </div>
 
             <div className="mt-4 flex items-center justify-between border-t border-border pt-4">

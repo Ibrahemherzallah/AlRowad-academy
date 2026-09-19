@@ -65,4 +65,18 @@ export const teacherApi = {
   earnings: async () =>
     unwrap((await api.get<ApiEnvelope<TeacherEarnings>>('/teacher/earnings')).data),
   students: async () => unwrap((await api.get<ApiEnvelope<unknown[]>>('/teacher/students')).data),
+  getCourse: async (id: string) =>
+    unwrap((await api.get<ApiEnvelope<{
+      course: Course;
+      students: {
+        id: string;
+        student: { name: string; phone: string; city?: string } | null;
+        amountPaid: number;
+        totalAmount: number;
+        paymentStatus: string;
+        createdAt: string;
+      }[];
+    }>>(`/teacher/courses/${id}`)).data),
+  updateLessons: async (courseId: string, lessons: { title: string; videoUrl: string; isFreePreview?: boolean }[]) =>
+    unwrap((await api.patch<ApiEnvelope<Course>>(`/teacher/courses/${courseId}/lessons`, { lessons })).data),
 };

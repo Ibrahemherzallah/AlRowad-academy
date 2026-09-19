@@ -1,12 +1,14 @@
 import type { Request, Response } from 'express';
 import type { FilterQuery } from 'mongoose';
-import { Course, type ICourse } from '@/models';
-import { Enrollment } from '@/models';
-import { ApiError } from '@/utils/apiError';
-import { catchAsync } from '@/utils/catchAsync';
-import { ok } from '@/utils/apiResponse';
-import type { ListCoursesQuery } from '@/validators/course.validators.js';
-import type { AuthedRequest } from '@/middleware/auth';
+import { Course, type ICourse } from '../models/Course.js';
+import { Enrollment } from '../models/Enrollment.js';
+import { ClassSchedule } from '../models/ClassSchedule.js';
+import { User } from '../models/User.js';
+import { ApiError } from '../utils/apiError.js';
+import { catchAsync } from '../utils/catchAsync.js';
+import { ok } from '../utils/apiResponse.js';
+import type { ListCoursesQuery } from '../validators/course.validators.js';
+import type { AuthedRequest } from '../middleware/auth.js';
 
 /** Strip lesson videoUrls from a course before returning to the public. */
 function publicCourse(course: ICourse) {
@@ -88,15 +90,16 @@ export const getCourseBySlug = catchAsync(async (req: Request, res: Response) =>
     throw ApiError.notFound('Course not found');
   }
 
-  const enrolledCount = await Enrollment.countDocuments({
-    courseId: course._id,
-    status: { $in: ['active', 'pending'] },
-  });
+  const [enrolledCount, schedules, teacher] = await Promise.all([
+    Enrollment.countDocuments({ courseId: course._id, status: { $in: ['active', 'pending'] } }),
+    ClassSchedule.find({ courseId: course._id }).select('label days startTime endTime room capacity'),
+    course.teacherId ? User.findById(course.teacherId).select('name bio specialty') : null,
+  ]);
 
   const data = publicCourse(course);
   const isFull = course.maxStudents != null && enrolledCount >= course.maxStudents;
 
-  return ok(res, { ...data, enrolledCount, isFull });
+  return ok(res, { ...data, enrolledCount, isFull, schedules, teacher });
 });
 
 /* ---------------- Admin ---------------- */

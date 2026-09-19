@@ -199,7 +199,15 @@
     "whatYouLearn": "ماذا ستتعلّم",
     "curriculum": "المنهج",
     "faq": "الأسئلة الشائعة",
-    "noResults": "لا توجد دورات مطابقة"
+    "noResults": "لا توجد دورات مطابقة",
+    "properties": "مميّزات الدورة",
+    "noProperties": "لم تُضَف مميّزات بعد",
+    "whatsappInquiry": "أهلاً، أريد الاستفسار عن دورة: ",
+    "whatsappBtn": "استفسر عبر واتساب",
+    "courseSchedules": "مواعيد الدورة",
+    "noSchedules": "لا توجد مواعيد محددة حتى الآن",
+    "chooseSchedule": "اختر الموعد المناسب لك",
+    "instructorBio": "نبذة عن المعلّم"
   },
   "auth": {
     "loginTitle": "تسجيل الدخول",
@@ -366,6 +374,8 @@
     "addCourse": "إضافة دورة",
     "confirmPayment": "تأكيد دفعة",
     "viewStudents": "عرض الطلاب",
+    "studentName": "اسم الطالب",
+    "studentNumber": "رقم الطالب",
     "student": "الطالب",
     "course": "الدورة",
     "amount": "المبلغ",
@@ -480,7 +490,24 @@
       "الخميس",
       "الجمعة",
       "السبت"
-    ]
+    ],
+    "uploadImage": "رفع صورة الغلاف",
+    "uploadImageHint": "اضغط لاختيار صورة (JPEG/PNG/WebP، حجم أقصى 5MB)",
+    "uploading": "جارٍ الرفع...",
+    "uploadSuccess": "تم رفع الصورة",
+    "uploadError": "فشل رفع الصورة",
+    "properties": "مميّزات الدورة",
+    "addProperty": "إضافة ميّزة",
+    "propertyPlaceholder": "مثال: ستتعلم استخدام Adobe Premiere Pro",
+    "faqs": "الأسئلة الشائعة",
+    "addFaq": "إضافة سؤال",
+    "faqQuestion": "السؤال",
+    "faqAnswer": "الجواب",
+    "schedules": "مواعيد الدورة",
+    "addSchedule": "إضافة موعد",
+    "noSchedules": "لم تُضَف مواعيد بعد",
+    "morning": "صباحي",
+    "evening": "مسائي"
   },
   "join": {
     "title": "انضمام إلى الدورة",

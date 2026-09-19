@@ -1,24 +1,34 @@
 import { Router } from 'express';
 import * as teacherController from '../controllers/teacher.controller.js';
-import { authenticate, requireRole } from '@/middleware/auth';
-import { validate } from '@/middleware/validate';
-import { teacherCreateCourseSchema, teacherUpdateCourseSchema, scheduleSchema, updateScheduleSchema, createInviteSchema } from '@/validators/teacher.validators';
-import { idParamSchema } from '@/validators/course.validators.js';
+import { authenticate, requireRole } from '../middleware/auth.js';
+import { validate } from '../middleware/validate.js';
+import {
+  teacherCreateCourseSchema,
+  teacherUpdateCourseSchema,
+  scheduleSchema,
+  updateScheduleSchema,
+  createInviteSchema,
+  updateTeacherProfileSchema,
+} from '../validators/teacher.validators';
+import { idParamSchema } from '../validators/course.validators.js';
 
 const router = Router();
 
 router.use(authenticate, requireRole('teacher'));
 
 router.get('/overview', teacherController.overview);
+router.patch('/profile', validate({ body: updateTeacherProfileSchema }), teacherController.updateProfile);
 
 /* Courses */
 router.get('/courses', teacherController.myCourses);
 router.post('/courses', validate({ body: teacherCreateCourseSchema }), teacherController.createCourse);
+router.get('/courses/:id', validate({ params: idParamSchema }), teacherController.getCourse);
 router.patch(
   '/courses/:id',
   validate({ params: idParamSchema, body: teacherUpdateCourseSchema }),
   teacherController.updateCourse,
 );
+router.patch('/courses/:id/lessons', validate({ params: idParamSchema }), teacherController.updateLessons);
 
 /* Schedules */
 router.get('/schedule', teacherController.mySchedule);

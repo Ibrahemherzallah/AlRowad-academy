@@ -199,7 +199,15 @@
     "whatYouLearn": "What you'll learn",
     "curriculum": "Curriculum",
     "faq": "FAQ",
-    "noResults": "No matching courses"
+    "noResults": "No matching courses",
+    "properties": "Course features",
+    "noProperties": "No features added yet",
+    "whatsappInquiry": "Hello, I'd like to inquire about the course: ",
+    "whatsappBtn": "Inquire via WhatsApp",
+    "courseSchedules": "Course schedules",
+    "noSchedules": "No schedules set yet",
+    "chooseSchedule": "Choose the right time for you",
+    "instructorBio": "About the instructor"
   },
   "auth": {
     "loginTitle": "Log in",
@@ -366,7 +374,8 @@
     "addCourse": "Add course",
     "confirmPayment": "Confirm payment",
     "viewStudents": "View students",
-    "student": "Student",
+    "studentName": "Student Name",
+    "studentNumber": "Student Number",
     "course": "Course",
     "amount": "Amount",
     "status": "Status",
@@ -480,7 +489,24 @@
       "Thursday",
       "Friday",
       "Saturday"
-    ]
+    ],
+    "uploadImage": "Upload cover image",
+    "uploadImageHint": "Click to choose an image (JPEG/PNG/WebP, max 5MB)",
+    "uploading": "Uploading...",
+    "uploadSuccess": "Image uploaded",
+    "uploadError": "Upload failed",
+    "properties": "Course features",
+    "addProperty": "Add feature",
+    "propertyPlaceholder": "e.g. You will learn Adobe Premiere Pro",
+    "faqs": "FAQs",
+    "addFaq": "Add question",
+    "faqQuestion": "Question",
+    "faqAnswer": "Answer",
+    "schedules": "Course schedules",
+    "addSchedule": "Add schedule",
+    "noSchedules": "No schedules added yet",
+    "morning": "Morning",
+    "evening": "Evening"
   },
   "join": {
     "title": "Join course",

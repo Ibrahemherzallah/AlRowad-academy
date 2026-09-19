@@ -100,7 +100,7 @@ export default function StudentReferralsPage() {
               <Card key={inv._id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="min-w-0">
                   <p className="font-semibold">
-                    {typeof inv.courseId === 'object' ? loc((inv.courseId as { title: LocalizedString }).title) : '—'}
+                    {inv.courseId && typeof inv.courseId === 'object' ? loc((inv.courseId as { title: LocalizedString }).title) : '—'}
                   </p>
                   <div className="mt-1 flex items-center gap-2 text-sm text-muted-foreground">
                     <Link2 className="size-4" />

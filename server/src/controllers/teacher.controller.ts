@@ -25,6 +25,16 @@ export const createCourse = catchAsync(async (req: AuthedRequest, res: Response)
   const exists = await Course.findOne({ slug: req.body.slug });
   if (exists) throw ApiError.conflict('A course with this slug already exists');
 
+  // Prevent the same teacher from creating two courses with identical Arabic titles.
+  const titleAr = (req.body.title as { ar?: string })?.ar?.trim();
+  if (titleAr) {
+    const duplicate = await Course.findOne({
+      teacherId: req.user!.id,
+      'title.ar': titleAr,
+    });
+    if (duplicate) throw ApiError.conflict('لديك دورة بنفس الاسم مسبقاً');
+  }
+
   const teacher = await User.findById(req.user!.id).select('name');
   const course = await Course.create({
     ...req.body,
@@ -132,7 +142,49 @@ export const myEarnings = catchAsync(async (req: AuthedRequest, res: Response) =
   return ok(res, data);
 });
 
-/** GET /api/teacher/students — students enrolled in this teacher's courses. */
+/** GET /api/teacher/courses/:id — full course detail with enrolled students. */
+export const getCourse = catchAsync(async (req: AuthedRequest, res: Response) => {
+  const course = await ownedCourse(req.user!.id, req.params.id);
+  const enrollments = await Enrollment.find({ courseId: course._id, status: { $in: ['active', 'pending'] } })
+    .populate('studentId', 'name phone city')
+    .sort({ createdAt: -1 });
+
+  return ok(res, {
+    course,
+    students: enrollments.map((e) => ({
+      id: e._id,
+      student: e.studentId,
+      amountPaid: e.amountPaid,
+      totalAmount: e.totalAmount,
+      paymentStatus: e.paymentStatus,
+      createdAt: e.createdAt,
+    })),
+  });
+});
+
+/** PATCH /api/teacher/courses/:id/lessons — replace entire lessons array on first section. */
+export const updateLessons = catchAsync(async (req: AuthedRequest, res: Response) => {
+  const course = await ownedCourse(req.user!.id, req.params.id);
+  const lessons = req.body.lessons as { title: string; videoUrl: string; isFreePreview?: boolean }[];
+
+  if (!Array.isArray(lessons)) throw ApiError.badRequest('lessons must be an array');
+
+  // Use the first curriculum section (create it if none exists).
+  if (!course.curriculum || course.curriculum.length === 0) {
+    course.curriculum = [{ title: 'الدروس المسجّلة', lessons: [] as never[] }] as never;
+  }
+  (course.curriculum[0] as { lessons: unknown[] }).lessons = lessons.map((l, i) => ({
+    title: l.title,
+    videoUrl: l.videoUrl ?? '',
+    bunnyVideoId: '',
+    duration: 0,
+    isFreePreview: l.isFreePreview ?? false,
+    order: i,
+  }));
+
+  await course.save();
+  return ok(res, course);
+});
 export const myStudents = catchAsync(async (req: AuthedRequest, res: Response) => {
   const courseIds = await Course.find({ teacherId: req.user!.id }).distinct('_id');
   const enrollments = await Enrollment.find({ courseId: { $in: courseIds } })
@@ -173,4 +225,16 @@ export const overview = catchAsync(async (req: AuthedRequest, res: Response) => 
     earnings,
     upcomingBlocks: sched.blocks.length,
   });
+});
+
+/** PATCH /api/teacher/profile — teacher updates their own bio and specialty. */
+export const updateProfile = catchAsync(async (req: AuthedRequest, res: Response) => {
+  const { bio, specialty } = req.body as { bio?: string; specialty?: string };
+  const teacher = await User.findByIdAndUpdate(
+    req.user!.id,
+    { ...(bio !== undefined && { bio }), ...(specialty !== undefined && { specialty }) },
+    { new: true },
+  );
+  if (!teacher) throw ApiError.notFound('User not found');
+  return ok(res, { name: teacher.name, bio: teacher.bio, specialty: teacher.specialty });
 });

@@ -1,5 +1,5 @@
 import mongoose, { Schema, model, type Document, type Types } from 'mongoose';
-import type { CourseStatus, LocalizedString } from '@/types';
+import type { CourseStatus, LocalizedString } from '../types/index.js';
 
 export interface ILesson {
   _id: Types.ObjectId;
@@ -58,6 +58,8 @@ export interface ICourse extends Document {
   curriculum: ISection[];
   attachments: IAttachment[];
   faqs: IFaq[];
+  /** Bullet-point features the teacher writes (replaces whatYouLearn/curriculum display). */
+  properties: string[];
   metaTitle?: string;
   metaDescription?: string;
   createdAt: Date;
@@ -114,6 +116,7 @@ const courseSchema = new Schema<ICourse>(
     curriculum: { type: [sectionSchema], default: [] },
     attachments: { type: [{ label: String, url: String }], default: [] },
     faqs: { type: [{ question: String, answer: String }], default: [] },
+    properties: { type: [String], default: [] },
     metaTitle: { type: String, default: '' },
     metaDescription: { type: String, default: '' },
   },

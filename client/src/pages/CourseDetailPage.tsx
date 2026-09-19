@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Clock, PlayCircle, Lock, User, CheckCircle2, Users } from 'lucide-react';
+import { Clock, User, CheckCircle2, MessageCircle, CalendarClock, GraduationCap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card } from '@/components/ui/card';
@@ -14,16 +14,22 @@ import { formatPrice } from '@/lib/utils';
 import { fetchCourseBySlug, type CourseDetail } from '@/lib/courses.api';
 import { useAuthStore } from '@/store/auth.store';
 
-function fmtDuration(sec: number, lang: string): string {
-  const m = Math.round(sec / 60);
-  return `${m} ${lang === 'ar' ? 'د' : 'min'}`;
+const DAY_NAMES_AR = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+const DAY_NAMES_EN = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+
+const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER ?? '970597250539';
+
+function whatsappLink(courseTitle: string) {
+  const msg = encodeURIComponent(`أهلاً، أريد الاستفسار عن دورة: ${courseTitle}`);
+  return `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
 }
+
 
 export default function CourseDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const { t, i18n } = useTranslation();
   const loc = useLocalized();
-  const { user } = useAuthStore();
+  const { } = useAuthStore();
 
   const [course, setCourse] = useState<CourseDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -68,16 +74,9 @@ export default function CourseDetailPage() {
     );
   }
 
-  const totalLessons =
-    course.curriculum?.reduce((s, sec) => s + (sec.lessons?.length ?? 0), 0) ?? 0;
+
   const hasDiscount = course.discountedPrice != null && course.discountedPrice < course.price;
   const comingSoon = course.status === 'coming_soon';
-
-  const learnPoints = [
-    t('courses.whatYouLearn'),
-    course.category,
-    course.instructorName,
-  ].filter(Boolean);
 
   return (
     <div className="container py-12">
@@ -93,16 +92,10 @@ export default function CourseDetailPage() {
             <h1 className="text-3xl font-extrabold leading-tight md:text-4xl">
               {loc(course.title)}
             </h1>
-            <p className="mt-4 text-lg text-muted-foreground">{loc(course.description)}</p>
-
             <div className="mt-5 flex flex-wrap items-center gap-5 text-sm text-muted-foreground">
               <span className="flex items-center gap-1.5">
-                <PlayCircle className="size-4" />
-                {totalLessons} {i18n.language === 'ar' ? 'درس' : 'lessons'}
-              </span>
-              <span className="flex items-center gap-1.5">
-                <Users className="size-4" />
-                {course.enrolledCount} {i18n.language === 'ar' ? 'مسجّل' : 'enrolled'}
+                <Clock className="size-4" />
+                {course.totalHours} {i18n.language === 'ar' ? 'ساعة' : 'hour'}
               </span>
               {course.instructorName && (
                 <span className="flex items-center gap-1.5">
@@ -113,65 +106,56 @@ export default function CourseDetailPage() {
             </div>
           </motion.div>
 
-          {/* Thumbnail / preview */}
-          <div className="mt-8 aspect-video overflow-hidden rounded-xl bg-muted">
-            {course.thumbnail ? (
-              <img src={course.thumbnail} alt={loc(course.title)} className="size-full object-cover" />
-            ) : (
-              <div className="grid size-full place-items-center gradient-brand text-6xl font-extrabold text-primary-foreground/90">
-                {loc(course.title).charAt(0)}
+          {/* Schedules timetable — replaces description in hero area */}
+          <div className="mt-8">
+            <h2 className="mb-4 text-xl font-bold">{t('courses.courseSchedules')}</h2>
+            {course.schedules && course.schedules.length > 0 ? (
+              <div className="grid gap-3 sm:grid-cols-2">
+                {course.schedules.map((s) => (
+                  <div key={s._id} className="flex items-start gap-4 rounded-xl border border-border bg-card p-4 transition-colors hover:border-primary/40 hover:bg-primary/5">
+                    <div className="grid size-10 shrink-0 place-items-center rounded-lg bg-primary/10 text-primary">
+                      <CalendarClock className="size-5" />
+                    </div>
+                    <div>
+                      {s.label && <p className="font-semibold">{s.label}</p>}
+                      <p className="text-sm text-muted-foreground">
+                        {s.days.map((d) => (i18n.language === 'ar' ? DAY_NAMES_AR[d] : DAY_NAMES_EN[d])).join(' · ')}
+                      </p>
+                      <p className="mt-1 font-mono text-sm font-medium" dir="ltr">
+                        {s.startTime} – {s.endTime}
+                      </p>
+                      {s.room && <p className="mt-1 text-xs text-muted-foreground">{s.room}</p>}
+                      {s.capacity && <p className="text-xs text-muted-foreground">{s.capacity} مقعد</p>}
+                    </div>
+                  </div>
+                ))}
               </div>
+            ) : (
+              <p className="rounded-xl border border-border bg-card p-5 text-muted-foreground">{t('courses.noSchedules')}</p>
             )}
           </div>
 
-          {/* What you'll learn */}
-          <section className="mt-10">
-            <h2 className="mb-4 text-xl font-bold">{t('courses.whatYouLearn')}</h2>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {learnPoints.map((point, i) => (
-                <div key={i} className="flex items-start gap-2 rounded-lg border border-border bg-card p-3">
-                  <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-primary" />
-                  <span className="text-sm">{point}</span>
-                </div>
-              ))}
-            </div>
-          </section>
+          {/* Course description */}
+          <div className="mt-8 rounded-xl border border-border bg-card p-6">
+            <p className="whitespace-pre-line leading-relaxed text-muted-foreground">
+              {loc(course.description)}
+            </p>
+          </div>
 
-          {/* Curriculum */}
-          <section className="mt-10">
-            <h2 className="mb-4 text-xl font-bold">{t('courses.curriculum')}</h2>
-            <div className="space-y-3">
-              {course.curriculum?.map((section) => (
-                <div key={section._id} className="rounded-lg border border-border bg-card">
-                  <div className="border-b border-border px-5 py-3 font-semibold">
-                    {section.title}
+          {/* Properties (replaces "what you'll learn" + curriculum) */}
+          {course.properties?.length > 0 && (
+            <section className="mt-10">
+              <h2 className="mb-4 text-xl font-bold">{t('courses.properties')}</h2>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {course.properties.map((point, i) => (
+                  <div key={i} className="flex items-start gap-2 rounded-lg border border-border bg-card p-3">
+                    <CheckCircle2 className="mt-0.5 size-5 shrink-0 text-primary" />
+                    <span className="text-sm">{point}</span>
                   </div>
-                  <ul className="divide-y divide-border">
-                    {section.lessons?.map((lesson) => (
-                      <li key={lesson._id} className="flex items-center justify-between px-5 py-3">
-                        <span className="flex items-center gap-2 text-sm">
-                          {lesson.isFreePreview ? (
-                            <PlayCircle className="size-4 text-primary" />
-                          ) : (
-                            <Lock className="size-4 text-muted-foreground" />
-                          )}
-                          {lesson.title}
-                          {lesson.isFreePreview && (
-                            <Badge variant="success" className="ms-1">
-                              {t('common.free')}
-                            </Badge>
-                          )}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {fmtDuration(lesson.duration, i18n.language)}
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              ))}
-            </div>
-          </section>
+                ))}
+              </div>
+            </section>
+          )}
 
           {/* Instructor */}
           {course.instructorBio && (
@@ -202,12 +186,44 @@ export default function CourseDetailPage() {
               </Accordion>
             </section>
           )}
+
+          {/* Teacher bio */}
+          {course.teacher && (course.teacher.bio || course.teacher.name) && (
+            <section className="mt-10">
+              <h2 className="mb-4 text-xl font-bold">{t('courses.instructorBio')}</h2>
+              <Card className="flex items-start gap-4 p-5">
+                <div className="grid size-14 shrink-0 place-items-center rounded-full bg-primary/10 text-primary text-xl font-extrabold">
+                  {course.teacher.name?.charAt(0) ?? <GraduationCap className="size-6" />}
+                </div>
+                <div>
+                  <p className="font-bold text-lg">{course.teacher.name}</p>
+                  {course.teacher.specialty && (
+                    <p className="text-sm text-primary mb-2">{course.teacher.specialty}</p>
+                  )}
+                  {course.teacher.bio && (
+                    <p className="text-sm text-muted-foreground leading-relaxed">{course.teacher.bio}</p>
+                  )}
+                </div>
+              </Card>
+            </section>
+          )}
         </div>
 
         {/* Sticky enroll card */}
         <aside className="lg:col-span-1">
           <div className="lg:sticky lg:top-24">
-            <Card className="p-6">
+            <Card className="overflow-hidden p-0">
+              {/* Small course thumbnail above price */}
+              <div className="aspect-video w-full bg-muted">
+                {course.thumbnail ? (
+                  <img src={course.thumbnail} alt={loc(course.title)} className="size-full object-cover" />
+                ) : (
+                  <div className="grid size-full place-items-center gradient-brand text-4xl font-extrabold text-primary-foreground/80">
+                    {loc(course.title).charAt(0)}
+                  </div>
+                )}
+              </div>
+              <div className="p-6">
               <div className="flex items-baseline gap-3">
                 <span className="text-3xl font-extrabold text-primary">
                   {formatPrice(course.effectivePrice, i18n.language)}
@@ -229,28 +245,15 @@ export default function CourseDetailPage() {
                     {t('courses.full')}
                   </Button>
                 ) : (
-                  <Button size="lg" className="w-full" asChild>
-                    <Link to={user ? `/checkout/${course.slug}` : `/register?next=/checkout/${course.slug}`}>
-                      {t('courses.enroll')}
-                    </Link>
+                  <Button size="lg" className="w-full gap-2 bg-[#25D366] hover:bg-[#20b858] text-white" asChild>
+                    <a href={whatsappLink(loc(course.title))} target="_blank" rel="noopener noreferrer">
+                      <MessageCircle className="size-5" />
+                      {t('courses.whatsappBtn')}
+                    </a>
                   </Button>
                 )}
               </div>
-
-              <ul className="mt-6 space-y-3 text-sm">
-                <li className="flex items-center gap-2">
-                  <Clock className="size-4 text-primary" />
-                  {totalLessons} {i18n.language === 'ar' ? 'درس مسجّل' : 'recorded lessons'}
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="size-4 text-primary" />
-                  {i18n.language === 'ar' ? 'متابعة شخصية 1:1' : '1:1 personal follow-up'}
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="size-4 text-primary" />
-                  {i18n.language === 'ar' ? 'شهادة إتمام' : 'Certificate of completion'}
-                </li>
-              </ul>
+              </div>
             </Card>
           </div>
         </aside>
