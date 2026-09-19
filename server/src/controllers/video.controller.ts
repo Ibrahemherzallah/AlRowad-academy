@@ -2,7 +2,7 @@ import type { Response } from 'express';
 import { Types } from 'mongoose';
 import { Course } from '@/models';
 import { Enrollment } from '@/models';
-import { signPlayback } from '@/services/video.service';
+import { signPlayback } from '@/services/video.service.js';
 import { ApiError } from '@/utils/apiError';
 import { catchAsync } from '@/utils/catchAsync';
 import { ok } from '@/utils/apiResponse';

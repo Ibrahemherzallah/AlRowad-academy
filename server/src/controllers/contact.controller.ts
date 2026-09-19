@@ -1,12 +1,12 @@
 import type { Request, Response } from 'express';
 import type { FilterQuery } from 'mongoose';
 import { ContactMessage, type IContactMessage } from '@/models';
-import { sendEmail } from '@/services/notify.service';
+import { sendEmail } from '@/services/notify.service.js';
 import { env } from '@/config/env';
 import { ApiError } from '@/utils/apiError';
 import { catchAsync } from '@/utils/catchAsync';
 import { ok } from '@/utils/apiResponse';
-import type { CreateContactInput } from '@/validators/contact.validators';
+import type { CreateContactInput } from '@/validators/contact.validators.js';
 import type { AuthedRequest } from '@/middleware/auth';
 
 /** POST /api/contact — public contact form submission. */

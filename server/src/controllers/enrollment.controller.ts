@@ -2,7 +2,7 @@ import type { Request, Response } from 'express';
 import { InviteLink } from '../models/InviteLink.js';
 import { Course } from '../models/Course.js';
 import { ClassSchedule } from '../models/ClassSchedule.js';
-import { createReservation } from '../services/enrollment.service';
+import { createReservation } from '../services/enrollment.service.js';
 import { ApiError } from '../utils/apiError.js';
 import { catchAsync } from '../utils/catchAsync.js';
 import { ok } from '../utils/apiResponse.js';

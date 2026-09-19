@@ -5,7 +5,7 @@ import { ClassSchedule } from '../models/ClassSchedule.js';
 import { InviteLink } from '../models/InviteLink.js';
 import { Enrollment } from '../models/Enrollment.js';
 import { User } from '../models/User.js';
-import { teacherEarnings, teacherSchedule } from '../services/teacher.service';
+import { teacherEarnings, teacherSchedule } from '../services/teacher.service.js';
 import { ApiError } from '../utils/apiError.js';
 import { catchAsync } from '../utils/catchAsync.js';
 import { ok } from '../utils/apiResponse.js';
