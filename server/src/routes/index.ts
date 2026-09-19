@@ -2,10 +2,10 @@ import { Router } from 'express';
 import authRoutes from './auth.routes.js';
 import courseRoutes from './course.routes.js';
 import contactRoutes from './contact.routes.js';
-import dashboardRoutes from './dashboard.routes';
+import dashboardRoutes from './dashboard.routes.js';
 import teacherRoutes from './teacher.routes.js';
 import enrollmentRoutes, { inviteRouter } from './enrollment.routes.js';
-import videoRoutes from './video.routes';
+import videoRoutes from './video.routes.js';
 import adminRoutes from './admin.routes.js';
 
 const router = Router();
