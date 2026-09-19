@@ -1,15 +1,15 @@
 import crypto from 'node:crypto';
 import type { Request, Response } from 'express';
 import { User, hashPassword } from '@/models';
-import { ensureLoyaltyAccount } from '@/services/loyalty.service';
-import { notifyStudent } from '@/services/notify.service';
+import { ensureLoyaltyAccount } from '@/services/loyalty.service.js';
+import { notifyStudent } from '@/services/notify.service.js';
 import { signAccessToken, signRefreshToken, verifyRefreshToken } from '@/utils/tokens';
 import { ApiError } from '@/utils/apiError';
 import { catchAsync } from '@/utils/catchAsync';
 import { ok } from '@/utils/apiResponse';
 import { env } from '@/config/env';
 import type { AuthedRequest } from '@/middleware/auth';
-import type { RegisterInput, LoginInput } from '@/validators/auth.validators';
+import type { RegisterInput, LoginInput } from '@/validators/auth.validators.js';
 
 const REFRESH_COOKIE = 'refreshToken';
 

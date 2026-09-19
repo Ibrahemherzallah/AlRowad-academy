@@ -6,7 +6,7 @@ import { InviteLink } from '../models/InviteLink.js';
 import { ClassSchedule } from '../models/ClassSchedule.js';
 import { TeacherCommission } from '../models/TeacherCommission.js';
 import { getSettings } from '../models/Settings.js';
-import { awardEnrollmentPoints, awardReferralPoints } from './loyalty.service';
+import { awardEnrollmentPoints, awardReferralPoints } from './loyalty.service.js';
 import { notifyStudent } from './notify.service.js';
 import { ApiError } from '../utils/apiError.js';
 import { logger } from '../utils/logger.js';

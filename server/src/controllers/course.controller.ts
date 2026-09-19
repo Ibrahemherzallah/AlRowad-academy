@@ -5,7 +5,7 @@ import { Enrollment } from '@/models';
 import { ApiError } from '@/utils/apiError';
 import { catchAsync } from '@/utils/catchAsync';
 import { ok } from '@/utils/apiResponse';
-import type { ListCoursesQuery } from '@/validators/course.validators';
+import type { ListCoursesQuery } from '@/validators/course.validators.js';
 import type { AuthedRequest } from '@/middleware/auth';
 
 /** Strip lesson videoUrls from a course before returning to the public. */

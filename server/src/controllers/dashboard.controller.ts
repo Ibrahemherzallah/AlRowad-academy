@@ -6,7 +6,7 @@ import { User } from '@/models';
 import { Session } from '@/models';
 import { LoyaltyVoucher } from '@/models';
 import { getSettings } from '@/models';
-import { ensureLoyaltyAccount } from '@/services/loyalty.service';
+import { ensureLoyaltyAccount } from '@/services/loyalty.service.js';
 import { catchAsync } from '@/utils/catchAsync';
 import { ok } from '@/utils/apiResponse';
 import type { AuthedRequest } from '@/middleware/auth';
