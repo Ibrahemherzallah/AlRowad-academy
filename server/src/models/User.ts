@@ -1,7 +1,7 @@
 import mongoose, { Schema, model, type Document, type Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { customAlphabet } from 'nanoid';
-import type { Role } from './index';
+import type { Role } from '@/types';
 
 const refCode = customAlphabet('ABCDEFGHJKLMNPQRSTUVWXYZ23456789', 8);
 

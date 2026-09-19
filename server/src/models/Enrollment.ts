@@ -1,5 +1,5 @@
 import mongoose, { Schema, model, type Document, type Types } from 'mongoose';
-import type { EnrollmentStatus, PaymentMethod, PaymentStatus } from './index';
+import type { EnrollmentStatus, PaymentMethod, PaymentStatus } from '@/types';
 
 export interface IInstallment {
   dueDate: Date;
