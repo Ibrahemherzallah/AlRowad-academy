@@ -56,6 +56,17 @@ export interface Course {
   maxStudents?: number | null;
   curriculum: Section[];
   faqs: { question: string; answer: string }[];
+  properties: string[];
+  schedules?: {
+    _id: string;
+    label: string;
+    days: number[];
+    startTime: string;
+    endTime: string;
+    room?: string;
+    capacity?: number | null;
+  }[];
+  teacher?: { name: string; bio?: string; specialty?: string } | null;
   createdAt: string;
 }
 

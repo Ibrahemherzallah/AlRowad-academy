@@ -125,3 +125,41 @@ export function bunnyUploadTarget(videoId: string): {
     headers: { AccessKey: env.BUNNY_STREAM_API_KEY },
   };
 }
+
+/**
+ * Upload an image buffer to Bunny.net Storage and return its public CDN URL.
+ * Used for course cover images. Requires BUNNY_STORAGE_* env vars.
+ * Falls back gracefully if not configured.
+ */
+export async function uploadImageToBunny(
+  buffer: Buffer,
+  fileName: string,
+  mimeType: string,
+): Promise<string> {
+  const zone = env.BUNNY_STORAGE_ZONE;
+  const apiKey = env.BUNNY_STORAGE_API_KEY;
+  const cdnHost = env.BUNNY_STORAGE_CDN_HOST;
+
+  if (!zone || !apiKey || !cdnHost) {
+    throw new Error('Bunny Storage not configured. Set BUNNY_STORAGE_ZONE, BUNNY_STORAGE_API_KEY, BUNNY_STORAGE_CDN_HOST.');
+  }
+
+  const path = `course-images/${Date.now()}-${fileName.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+  const url = `https://storage.bunnycdn.com/${zone}/${path}`;
+
+  const res = await fetch(url, {
+    method: 'PUT',
+    headers: {
+      AccessKey: apiKey,
+      'Content-Type': mimeType,
+    },
+    body: buffer as unknown as BodyInit,
+  });
+
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Bunny upload failed: ${res.status} ${text}`);
+  }
+
+  return `https://${cdnHost}/${path}`;
+}

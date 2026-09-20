@@ -44,7 +44,8 @@ export default function AdminStudentsPage() {
             <table className="w-full text-sm">
               <thead className="border-b border-border bg-muted/50">
                 <tr>
-                  <th className="p-3 text-start font-semibold">{t('admin.student')}</th>
+                  <th className="p-3 text-start font-semibold">{t('admin.studentName')}</th>
+                  <th className="p-3 text-start font-semibold">{t('admin.studentNumber')}</th>
                   <th className="p-3 text-start font-semibold">{t('admin.city')}</th>
                   <th className="p-3 text-start font-semibold">{t('admin.enrollments')}</th>
                   <th className="p-3 text-start font-semibold">{t('admin.totalPaid')}</th>
@@ -54,10 +55,8 @@ export default function AdminStudentsPage() {
               <tbody>
                 {filtered.map((s) => (
                   <tr key={s._id} className="border-b border-border last:border-0 hover:bg-muted/30">
-                    <td className="p-3">
-                      <p className="font-medium">{s.name}</p>
-                      <p className="text-xs text-muted-foreground" dir="ltr">{s.phone}</p>
-                    </td>
+                    <td className="p-3"> {s.name}</td>
+                    <td className="p-3"> {s.phone}</td>
                     <td className="p-3 text-muted-foreground">{s.city || '—'}</td>
                     <td className="p-3">{s.enrollmentCount}</td>
                     <td className="p-3 font-semibold text-success">{formatPrice(s.totalPaid, i18n.language)}</td>

@@ -6,6 +6,7 @@ import dashboardRoutes from './dashboard.routes.js';
 import teacherRoutes from './teacher.routes.js';
 import enrollmentRoutes, { inviteRouter } from './enrollment.routes.js';
 import videoRoutes from './video.routes.js';
+import uploadRoutes from './upload.routes';
 import adminRoutes from './admin.routes.js';
 
 const router = Router();
@@ -22,6 +23,7 @@ router.use('/teacher', teacherRoutes);
 router.use('/enrollments', enrollmentRoutes);
 router.use('/invites', inviteRouter);
 router.use('/videos', videoRoutes);
+router.use('/upload', uploadRoutes);
 router.use('/admin', adminRoutes);
 
 // Phase 1 continued (mounted in later modules):

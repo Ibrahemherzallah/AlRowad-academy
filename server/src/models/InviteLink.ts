@@ -12,7 +12,7 @@ export interface IInviteLink extends Document {
   _id: Types.ObjectId;
   code: string;
   inviterId: Types.ObjectId;
-  inviterRole: 'teacher' | 'student';
+  inviterRole: 'teacher' | 'student' | 'admin';
   courseId: Types.ObjectId;
   uses: number;
   isActive: boolean;
@@ -24,7 +24,7 @@ const inviteLinkSchema = new Schema<IInviteLink>(
   {
     code: { type: String, unique: true, index: true },
     inviterId: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-    inviterRole: { type: String, enum: ['teacher', 'student'], required: true },
+    inviterRole: { type: String, enum: ['teacher', 'student', 'admin'], required: true },
     courseId: { type: Schema.Types.ObjectId, ref: 'Course', required: true, index: true },
     uses: { type: Number, default: 0 },
     isActive: { type: Boolean, default: true },

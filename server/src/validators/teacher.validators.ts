@@ -20,6 +20,8 @@ export const teacherCreateCourseSchema = z.object({
   discountedPrice: z.number().min(0).nullable().optional(),
   startDate: z.coerce.date().nullable().optional(),
   endDate: z.coerce.date().nullable().optional(),
+  properties: z.array(z.string().min(1).max(200)).optional(),
+  faqs: z.array(z.object({ question: z.string().min(1), answer: z.string().min(1) })).optional(),
 });
 
 export const teacherUpdateCourseSchema = teacherCreateCourseSchema.partial();
@@ -42,4 +44,9 @@ export const updateScheduleSchema = scheduleSchema.partial().omit({ courseId: tr
 
 export const createInviteSchema = z.object({
   courseId: z.string().regex(/^[a-f\d]{24}$/i),
+});
+
+export const updateTeacherProfileSchema = z.object({
+  bio: z.string().max(500).optional(),
+  specialty: z.string().max(120).optional(),
 });

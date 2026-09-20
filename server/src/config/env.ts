@@ -31,6 +31,11 @@ const envSchema = z.object({
   BUNNY_STREAM_TOKEN_KEY: z.string().optional(), // token authentication key
   BUNNY_SIGNED_URL_TTL: z.coerce.number().default(600), // seconds a play URL is valid
 
+  // Bunny.net Storage — image/file hosting (course covers, attachments)
+  BUNNY_STORAGE_ZONE: z.string().optional(), // storage zone name
+  BUNNY_STORAGE_API_KEY: z.string().optional(), // storage API key
+  BUNNY_STORAGE_CDN_HOST: z.string().optional(), // e.g. myzone.b-cdn.net
+
   EMAIL_PROVIDER: z.string().default('stub'),
   EMAIL_API_KEY: z.string().optional(),
   EMAIL_FROM: z.string().default('no-reply@rawad.academy'),

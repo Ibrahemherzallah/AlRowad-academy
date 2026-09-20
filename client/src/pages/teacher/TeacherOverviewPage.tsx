@@ -1,12 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BookOpen, Users, Wallet, CalendarClock } from 'lucide-react';
+import { BookOpen, Users, Wallet, CalendarClock, Edit2, Check, X } from 'lucide-react';
 import { StatCard } from '@/components/dashboard/StatCard';
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
+import { toast } from '@/components/ui/toast';
 import { formatPrice } from '@/lib/utils';
 import { teacherApi, type TeacherOverview } from '@/lib/teacher.api';
 import { useAuthStore } from '@/store/auth.store';
+import { api } from '@/lib/api';
 
 export default function TeacherOverviewPage() {
   const { t, i18n } = useTranslation();
@@ -60,6 +65,54 @@ export default function TeacherOverviewPage() {
           </div>
         </div>
       </Card>
+
+      <BioEditor />
     </div>
+  );
+}
+
+/** Inline bio/specialty editor shown on the teacher overview. */
+function BioEditor() {
+  const { t } = useTranslation();
+  const user = useAuthStore((s) => s.user);
+  const [editing, setEditing] = useState(false);
+  const [bio, setBio] = useState('');
+  const [specialty, setSpecialty] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await api.patch('/teacher/profile', { bio, specialty });
+      toast.success(t('common.save'));
+      setEditing(false);
+    } catch { toast.error(t('common.error')); }
+    finally { setSaving(false); }
+  };
+
+  return (
+    <Card className="p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h3 className="text-lg font-bold">{t('courses.instructorBio')}</h3>
+        {!editing ? (
+          <Button size="sm" variant="outline" onClick={() => setEditing(true)}>
+            <Edit2 className="size-4" />{t('admin.bio')}
+          </Button>
+        ) : (
+          <div className="flex gap-2">
+            <Button size="sm" onClick={save} disabled={saving}><Check className="size-4" /></Button>
+            <Button size="sm" variant="ghost" onClick={() => setEditing(false)}><X className="size-4" /></Button>
+          </div>
+        )}
+      </div>
+      {editing ? (
+        <div className="space-y-3">
+          <Input value={specialty} onChange={(e) => setSpecialty(e.target.value)} placeholder={t('admin.specialty')} />
+          <Textarea value={bio} onChange={(e) => setBio(e.target.value)} rows={3} placeholder="نبذة عنك تظهر في صفحة الدورة..." />
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">{user?.name} — {t('admin.bio')}</p>
+      )}
+    </Card>
   );
 }
