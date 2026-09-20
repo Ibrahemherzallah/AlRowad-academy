@@ -104,10 +104,7 @@ export async function awardEnrollmentPoints(
  * course (+10 by default). Mirrors the threshold→voucher logic of enrollment
  * points so a referral can also trip the 20-point reward.
  */
-export async function awardReferralPoints(
-  inviterId: string | Types.ObjectId,
-  friendName: string,
-): Promise<AwardResult> {
+export async function awardReferralPoints(inviterId: string | Types.ObjectId, friendName: string,): Promise<AwardResult> {
   const settings = await getSettings();
   if (!settings.loyalty.enabled) {
     const account = await ensureLoyaltyAccount(inviterId);

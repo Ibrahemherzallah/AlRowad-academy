@@ -4,8 +4,9 @@ import { User, hashPassword } from '../models/User.js';
 import { Course } from '../models/Course.js';
 import { Enrollment } from '../models/Enrollment.js';
 import { TeacherCommission } from '../models/TeacherCommission.js';
+import { InviteLink } from '../models/InviteLink';
 import { ensureLoyaltyAccount } from '../services/loyalty.service.js';
-import { createReservation, recordPayment } from '../services/enrollment.service.js';
+import { createReservation, recordPayment } from '../services/enrollment.service';
 import { getSettings } from '../models/Settings.js';
 import { ApiError } from '../utils/apiError.js';
 import { catchAsync } from '../utils/catchAsync.js';
@@ -136,12 +137,13 @@ export const pricePreview = catchAsync(async (req: AuthedRequest, res: Response)
  * service computes remaining balance and accrues teacher commission.
  */
 export const connectStudent = catchAsync(async (req: AuthedRequest, res: Response) => {
-  const { studentId, courseId, amount, paymentMethod, scheduleId } = req.body as {
+  const { studentId, courseId, amount, paymentMethod, scheduleId, inviteCode } = req.body as {
     studentId: string;
     courseId: string;
     amount: number;
     paymentMethod?: 'online' | 'bank_transfer' | 'cash';
     scheduleId?: string;
+    inviteCode?: string;
   };
 
   const student = await User.findOne({ _id: studentId, role: 'student' });
@@ -153,6 +155,8 @@ export const connectStudent = catchAsync(async (req: AuthedRequest, res: Respons
     amount,
     paymentMethod: paymentMethod ?? 'cash',
     scheduleId: scheduleId ?? null,
+    inviteCode: inviteCode ?? null,
+    skipMinimum: true, // admin can set any amount
   });
   return ok(res, enrollment, 201);
 });
@@ -230,4 +234,60 @@ export const settleCommissions = catchAsync(async (req: AuthedRequest, res: Resp
     { status: 'paid', paidAt: new Date() },
   );
   return ok(res, { settled: result.modifiedCount });
+});
+
+/**
+ * POST /api/admin/invites — admin creates an invite link for any course.
+ * Inviter is the admin; rate is 2% (tracked, marked paid immediately as academy revenue).
+ */
+export const adminCreateInvite = catchAsync(async (req: AuthedRequest, res: Response) => {
+  const { courseId } = req.body as { courseId: string };
+  const course = await Course.findById(courseId).select('_id status title');
+  if (!course) throw ApiError.notFound('Course not found');
+
+  // Reuse an existing active admin link for this course if present.
+  let invite = await InviteLink.findOne({
+    inviterId: req.user!.id,
+    courseId,
+    inviterRole: 'admin',
+    isActive: true,
+  });
+  if (!invite) {
+    invite = await InviteLink.create({
+      inviterId: req.user!.id,
+      inviterRole: 'admin',
+      courseId,
+    });
+  }
+
+  const { env } = await import('../config/env.js');
+  return ok(res, { ...invite.toObject(), url: `${env.CLIENT_URL}/join/${invite.code}` }, 201);
+});
+
+/**
+ * GET /api/admin/enrollments/:id/payments — all payment history for one enrollment.
+ */
+export const enrollmentPayments = catchAsync(async (req: AuthedRequest, res: Response) => {
+  const enrollment = await Enrollment.findById(req.params.id)
+    .populate('studentId', 'name phone')
+    .populate('courseId', 'title slug price');
+  if (!enrollment) throw ApiError.notFound('Enrollment not found');
+
+  const commissions = await TeacherCommission.find({ enrollmentId: req.params.id }).sort({ createdAt: 1 });
+
+  return ok(res, {
+    enrollment: {
+      id: enrollment._id,
+      student: enrollment.studentId,
+      course: enrollment.courseId,
+      amountPaid: enrollment.amountPaid,
+      totalAmount: enrollment.totalAmount,
+      remaining: enrollment.totalAmount - enrollment.amountPaid,
+      paymentStatus: enrollment.paymentStatus,
+      paymentMethod: enrollment.paymentMethod,
+      commissionedAmount: enrollment.commissionedAmount,
+      createdAt: enrollment.createdAt,
+    },
+    commissions,
+  });
 });

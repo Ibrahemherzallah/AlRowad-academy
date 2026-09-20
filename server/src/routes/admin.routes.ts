@@ -3,23 +3,24 @@ import * as courseController from '../controllers/course.controller.js';
 import * as contactController from '../controllers/contact.controller.js';
 import * as dashboardController from '../controllers/dashboard.controller.js';
 import * as adminUsers from '../controllers/adminUsers.controller.js';
-import { authenticate, requireRole } from '@/middleware/auth';
-import { validate } from '@/middleware/validate';
+import { authenticate, requireRole } from '../middleware/auth.js';
+import { validate } from '../middleware/validate.js';
 import {
   createCourseSchema,
   updateCourseSchema,
   idParamSchema,
-} from '@/validators/course.validators.js';
+} from '../validators/course.validators.js';
 import {
   listContactQuerySchema,
   updateContactSchema,
-} from '@/validators/contact.validators.js';
+} from '../validators/contact.validators.js';
 import {
   createTeacherSchema,
   updateTeacherSchema,
   connectStudentSchema,
   addPaymentSchema,
-} from '@/validators/adminUsers.validators.js';
+  adminCreateInviteSchema,
+} from '../validators/adminUsers.validators';
 
 const router = Router();
 
@@ -63,6 +64,10 @@ router.post(
   validate({ params: idParamSchema, body: addPaymentSchema }),
   adminUsers.addPayment,
 );
+router.get('/enrollments/:id/payments', validate({ params: idParamSchema }), adminUsers.enrollmentPayments);
+
+/* Admin invite links */
+router.post('/invites', validate({ body: adminCreateInviteSchema }), adminUsers.adminCreateInvite);
 
 /* Contact messages */
 router.get('/contact', validate({ query: listContactQuerySchema }), contactController.adminListContact);

@@ -22,9 +22,14 @@ export const updateTeacherSchema = z.object({
 export const connectStudentSchema = z.object({
   studentId: objectId,
   courseId: objectId,
-  amount: z.number().positive(),
+  amount: z.number().min(0), // admin can enter 0 or any amount
   paymentMethod: z.enum(['online', 'bank_transfer', 'cash']).optional(),
   scheduleId: objectId.optional(),
+  inviteCode: z.string().max(56).optional(),
+});
+
+export const adminCreateInviteSchema = z.object({
+  courseId: objectId,
 });
 
 export const addPaymentSchema = z.object({

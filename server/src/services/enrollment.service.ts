@@ -6,8 +6,8 @@ import { InviteLink } from '../models/InviteLink.js';
 import { ClassSchedule } from '../models/ClassSchedule.js';
 import { TeacherCommission } from '../models/TeacherCommission.js';
 import { getSettings } from '../models/Settings.js';
-import { awardEnrollmentPoints, awardReferralPoints } from './loyalty.service.js';
-import { notifyStudent } from './notify.service.js';
+import { awardEnrollmentPoints, awardReferralPoints } from '../services/loyalty.service.js';
+import { notifyStudent } from '../services/notify.service.js';
 import { ApiError } from '../utils/apiError.js';
 import { logger } from '../utils/logger.js';
 import type { PaymentMethod } from '../types/index.js';
@@ -15,31 +15,54 @@ import type { PaymentMethod } from '../types/index.js';
 interface CreateEnrollmentInput {
   studentId: string | Types.ObjectId;
   courseId: string | Types.ObjectId;
-  amount: number; // initial payment (must be >= min reservation)
+  amount: number;
   paymentMethod?: PaymentMethod;
-  inviteCode?: string | null; // invite link code used to join
-  scheduleId?: string | null; // chosen class section
+  inviteCode?: string | null;
+  scheduleId?: string | null;
+  /** When true (admin only) skip the 30% minimum — any amount including 0 is valid. */
+  skipMinimum?: boolean;
 }
 
 /** Effective (possibly discounted) course price. */
 function coursePrice(course: ICourse): number {
   return course.discountedPrice != null && course.discountedPrice < course.price
-    ? course.discountedPrice
-    : course.price;
+      ? course.discountedPrice
+      : course.price;
 }
 
 /**
  * Accrue teacher commission for a newly-received payment.
- * Commission = teacher.commissionRate × amount, recorded once per payment.
+ * Commission is ONLY accrued when the student joined via a teacher invite link.
+ * (Not for every course that happens to have a teacher.)
  */
 async function accrueCommission(
-  enrollment: IEnrollment,
-  course: ICourse,
-  paymentAmount: number,
+    enrollment: IEnrollment,
+    course: ICourse,
+    paymentAmount: number,
 ): Promise<void> {
-  if (!course.teacherId || paymentAmount <= 0) return;
+  if (paymentAmount <= 0) return;
 
-  const teacher = await User.findById(course.teacherId).select('commissionRate');
+  // Only accrue if the student used a teacher invite link.
+  if (!enrollment.invitedVia) {
+    logger.info(`Commission skipped: no invitedVia on enrollment ${enrollment._id}`);
+    return;
+  }
+
+  const invite = await InviteLink.findById(enrollment.invitedVia).select('inviterRole inviterId');
+  if (!invite) {
+    logger.warn(`Commission skipped: invite ${enrollment.invitedVia} not found`);
+    return;
+  }
+  if (invite.inviterRole !== 'teacher') {
+    logger.info(`Commission skipped: inviterRole=${invite.inviterRole}, not teacher`);
+    return;
+  }
+
+  // The teacher must own this course.
+  const teacherId = invite.inviterId;
+  if (!teacherId) return;
+
+  const teacher = await User.findById(teacherId).select('commissionRate');
   if (!teacher) return;
 
   const settings = await getSettings();
@@ -48,18 +71,18 @@ async function accrueCommission(
   if (amount <= 0) return;
 
   await TeacherCommission.create({
-    teacherId: course.teacherId,
+    teacherId,
     courseId: course._id,
     studentId: enrollment.studentId,
     enrollmentId: enrollment._id,
-    inviteLinkId: enrollment.invitedVia ?? null,
+    inviteLinkId: enrollment.invitedVia,
     basisAmount: paymentAmount,
     rate,
     amount,
   });
 
   enrollment.commissionedAmount += paymentAmount;
-  logger.info(`Commission accrued: ${amount} to teacher ${course.teacherId} (${rate * 100}% of ${paymentAmount})`);
+  logger.info(`Commission accrued: ${amount} to teacher ${teacherId} (${rate * 100}% of ${paymentAmount})`);
 }
 
 /** Derive paymentStatus from amounts. */
@@ -93,9 +116,9 @@ export async function createReservation(input: CreateEnrollmentInput): Promise<I
   const total = coursePrice(course);
   const minPay = Math.ceil((total * settings.enrollment.seatReservationMinPercent) / 100);
 
-  if (input.amount < minPay) {
+  if (!input.skipMinimum && input.amount < minPay) {
     throw ApiError.badRequest(
-      `Minimum reservation is ${settings.enrollment.seatReservationMinPercent}% (${minPay})`,
+        `Minimum reservation is ${settings.enrollment.seatReservationMinPercent}% (${minPay})`,
     );
   }
   if (input.amount > total) throw ApiError.badRequest('Amount exceeds course price');
@@ -105,11 +128,14 @@ export async function createReservation(input: CreateEnrollmentInput): Promise<I
   let invite = null;
   if (input.inviteCode) {
     invite = await InviteLink.findOne({ code: input.inviteCode.toUpperCase(), isActive: true });
-    if (invite && String(invite.courseId) === String(course._id)) {
-      invitedVia = invite._id;
-    } else {
-      invite = null; // invalid or wrong course — ignore silently
+    if (!invite) {
+      throw ApiError.badRequest('رمز الدعوة غير صالح أو منتهي الصلاحية');
     }
+    if (String(invite.courseId) !== String(course._id)) {
+      throw ApiError.badRequest('رمز الدعوة لا ينتمي لهذه الدورة');
+    }
+    invitedVia = invite._id;
+    logger.info(`Invite resolved: code=${input.inviteCode} role=${invite.inviterRole} inviter=${invite.inviterId}`);
   }
 
   // Validate chosen schedule belongs to this course.
@@ -121,8 +147,8 @@ export async function createReservation(input: CreateEnrollmentInput): Promise<I
 
   const now = new Date();
   const accessEnd = course.endDate
-    ? new Date(course.endDate.getTime() + course.accessBufferWeeks * 7 * 86_400_000)
-    : null;
+      ? new Date(course.endDate.getTime() + course.accessBufferWeeks * 7 * 86_400_000)
+      : null;
 
   const enrollment = await Enrollment.create({
     studentId,
@@ -147,10 +173,30 @@ export async function createReservation(input: CreateEnrollmentInput): Promise<I
     invite.uses += 1;
     await invite.save();
     if (invite.inviterRole === 'student') {
+      // Student invite → referral points to the inviter
       const friend = await User.findById(studentId).select('name');
       await awardReferralPoints(invite.inviterId, friend?.name ?? 'صديق');
+    } else if (invite.inviterRole === 'admin') {
+      // Admin invite → 2% commission tracked as academy revenue (no external payout)
+      // We record it but mark immediately as paid since admin = academy
+      if (input.amount > 0) {
+        const adminCommission = Math.round(input.amount * 0.02 * 100) / 100;
+        await TeacherCommission.create({
+          teacherId: invite.inviterId, // admin user id
+          courseId: course._id,
+          studentId,
+          enrollmentId: enrollment._id,
+          inviteLinkId: invite._id,
+          basisAmount: input.amount,
+          rate: 0.02,
+          amount: adminCommission,
+          status: 'paid', // admin commission is academy revenue, mark paid immediately
+          paidAt: new Date(),
+        });
+        logger.info(`Admin invite commission: ${adminCommission} (2% of ${input.amount})`);
+      }
     }
-    // teacher invite → commission already handled via accrueCommission
+    // teacher invite → commission already handled via accrueCommission above
   }
 
   // +5 enrollment points to the student (once).
@@ -166,9 +212,9 @@ export async function createReservation(input: CreateEnrollmentInput): Promise<I
     const remaining = total - input.amount;
     await notifyStudent(student, {
       whatsapp:
-        remaining > 0
-          ? `✅ تم حجز مقعدك في ${course.title.ar}. دفعت ${input.amount} والمتبقّي ${remaining}.`
-          : `✅ تم تسجيلك بالكامل في ${course.title.ar}. أهلاً بك!`,
+          remaining > 0
+              ? `✅ تم حجز مقعدك في ${course.title.ar}. دفعت ${input.amount} والمتبقّي ${remaining}.`
+              : `✅ تم تسجيلك بالكامل في ${course.title.ar}. أهلاً بك!`,
     });
   }
 
@@ -180,9 +226,9 @@ export async function createReservation(input: CreateEnrollmentInput): Promise<I
  * balance settlement). Accrues commission on the new amount and updates status.
  */
 export async function recordPayment(
-  enrollmentId: string | Types.ObjectId,
-  amount: number,
-  method?: PaymentMethod,
+    enrollmentId: string | Types.ObjectId,
+    amount: number,
+    method?: PaymentMethod,
 ): Promise<IEnrollment> {
   if (amount <= 0) throw ApiError.badRequest('Payment amount must be positive');
 
@@ -208,9 +254,9 @@ export async function recordPayment(
     const left = enrollment.totalAmount - enrollment.amountPaid;
     await notifyStudent(student, {
       whatsapp:
-        left > 0
-          ? `💵 استلمنا دفعة ${amount} لدورة ${course.title.ar}. المتبقّي ${left}.`
-          : `🎉 اكتمل دفع دورة ${course.title.ar}. شكراً لك!`,
+          left > 0
+              ? `💵 استلمنا دفعة ${amount} لدورة ${course.title.ar}. المتبقّي ${left}.`
+              : `🎉 اكتمل دفع دورة ${course.title.ar}. شكراً لك!`,
     });
   }
 

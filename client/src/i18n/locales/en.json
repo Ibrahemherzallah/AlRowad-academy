@@ -434,7 +434,18 @@
     "joinedVia": "Joined via invite",
     "paymentStatus": "Payment status",
     "recordPayment": "Record payment",
-    "payNow": "Confirm payment"
+    "payNow": "Confirm payment",
+    "inviteCode": "Invite code (optional)",
+    "adminInvite": "Create invite link",
+    "inviteType": "Link source",
+    "teacherInvite": "Teacher (10%)",
+    "adminInviteLabel": "Academy (2%)",
+    "studentInviteLabel": "Student (points)",
+    "paymentHistory": "Payment history",
+    "addPaymentTo": "Add payment",
+    "viewPayments": "View payments",
+    "noMinimum": "No minimum",
+    "anyAmount": "Any amount"
   },
   "teacher": {
     "panel": "Teacher Panel",

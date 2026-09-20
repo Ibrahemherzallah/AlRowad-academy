@@ -435,7 +435,18 @@
     "joinedVia": "انضم عبر دعوة",
     "paymentStatus": "حالة الدفع",
     "recordPayment": "تسجيل دفعة",
-    "payNow": "تأكيد الدفعة"
+    "payNow": "تأكيد الدفعة",
+    "inviteCode": "كود الدعوة (اختياري)",
+    "adminInvite": "إنشاء رابط دعوة",
+    "inviteType": "مصدر الرابط",
+    "teacherInvite": "معلّم (10%)",
+    "adminInviteLabel": "أكاديمية (2%)",
+    "studentInviteLabel": "طالب (نقاط)",
+    "paymentHistory": "سجل الدفعات",
+    "addPaymentTo": "إضافة دفعة",
+    "viewPayments": "عرض الدفعات",
+    "noMinimum": "بدون حد أدنى",
+    "anyAmount": "أي مبلغ"
   },
   "teacher": {
     "panel": "لوحة المعلّم",

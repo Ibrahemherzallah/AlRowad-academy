@@ -50,6 +50,7 @@ export const adminApi = {
   settleTeacher: async (id: string) => api.post(`/admin/teachers/${id}/settle`),
 
   students: async () => unwrap((await api.get<ApiEnvelope<StudentRow[]>>('/admin/students')).data),
+  listEnrollments: async () => unwrap((await api.get<ApiEnvelope<unknown[]>>('/admin/enrollments')).data),
   courses: async () => unwrap((await api.get<ApiEnvelope<Course[]>>('/admin/courses')).data),
   updateCourse: async (id: string, payload: Record<string, unknown>) =>
     unwrap((await api.patch<ApiEnvelope<Course>>(`/admin/courses/${id}`, payload)).data),
@@ -73,4 +74,10 @@ export const adminApi = {
 
   courseStats: async (id: string) =>
     unwrap((await api.get<ApiEnvelope<CourseStats>>(`/admin/courses/${id}/stats`)).data),
+
+  enrollmentPayments: async (enrollmentId: string) =>
+    unwrap((await api.get<ApiEnvelope<unknown>>(`/admin/enrollments/${enrollmentId}/payments`)).data),
+
+  createAdminInvite: async (courseId: string) =>
+    unwrap((await api.post<ApiEnvelope<{ code: string; url: string; uses: number }>>('/admin/invites', { courseId })).data),
 };
