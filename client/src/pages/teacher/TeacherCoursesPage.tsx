@@ -5,6 +5,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { Select } from '@/components/ui/select';
 import { Field } from '@/components/ui/field';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -13,6 +14,7 @@ import { toast } from '@/components/ui/toast';
 import { useLocalized } from '@/hooks/useLocalized';
 import { formatPrice } from '@/lib/utils';
 import { teacherApi } from '@/lib/teacher.api';
+import { api } from '@/lib/api';
 import type { Course } from '@/lib/types';
 
 const slugify = (s: string) =>
@@ -58,6 +60,7 @@ export default function TeacherCoursesPage() {
   const [saving, setSaving] = useState(false);
   const [openSection, setOpenSection] = useState<string>('basic');
   const [selectedCourseId, setSelectedCourseId] = useState<string | null>(null);
+  const [categories, setCategories] = useState<{ ar: string; en: string }[]>([]);
 
   const [form, setForm] = useState({ titleAr: '', titleEn: '', descAr: '', descEn: '', category: '', totalHours: 40, price: 0, thumbnail: '' });
   const [properties, setProperties] = useState<string[]>(['']);
@@ -66,7 +69,13 @@ export default function TeacherCoursesPage() {
 
   const load = () => {
     setLoading(true);
-    teacherApi.courses().then(setCourses).catch(() => setCourses([])).finally(() => setLoading(false));
+    Promise.all([
+      teacherApi.courses(),
+      api.get<{ success: boolean; data: { ar: string; en: string }[] }>('/courses/categories').then((r) => r.data.data).catch(() => []),
+    ]).then(([c, cats]) => {
+      setCourses(c);
+      setCategories(cats);
+    }).catch(() => setCourses([])).finally(() => setLoading(false));
   };
   useEffect(load, []);
 
@@ -156,7 +165,12 @@ export default function TeacherCoursesPage() {
                 </div>
                 <div className="grid gap-4 sm:grid-cols-3">
                   <Field id="category" label={t('teacher.category')}>
-                    <Input value={form.category} onChange={(e) => setF('category', e.target.value)} />
+                    <Select value={form.category} onChange={(e) => setF('category', e.target.value)}>
+                      <option value="">— اختر التصنيف —</option>
+                      {categories.map((c, i) => (
+                        <option key={i} value={c.ar}>{c.ar}</option>
+                      ))}
+                    </Select>
                   </Field>
                   <Field id="totalHours" label={t('teacher.totalHours')}>
                     <Input type="number" min={1} value={form.totalHours} onChange={(e) => setF('totalHours', +e.target.value)} dir="ltr" />

@@ -37,9 +37,9 @@ export async function fetchCourses(filters: CourseFilters = {}): Promise<Courses
   };
 }
 
-export async function fetchCategories(): Promise<string[]> {
-  const { data } = await api.get<ApiEnvelope<string[]>>('/courses/categories');
-  return unwrap(data);
+export async function fetchCategories(): Promise<{ ar: string; en: string; icon?: string }[]> {
+  const { data } = await api.get<ApiEnvelope<{ ar: string; en: string; icon?: string }[]>>('/courses/categories');
+  return data.data ?? [];
 }
 
 export async function fetchCourseBySlug(slug: string): Promise<CourseDetail> {

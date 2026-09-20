@@ -6,12 +6,10 @@ import {
   GraduationCap,
   CreditCard,
   Tag,
-  Gift,
   CalendarClock,
-  Briefcase,
   MessageSquare,
-  Bell,
   Settings,
+  TrendingUp,
 } from 'lucide-react';
 import { DashboardLayout, type NavItem } from './DashboardLayout';
 import { api } from '@/lib/api';
@@ -33,12 +31,11 @@ export function AdminDashboardLayout() {
     { to: '/admin/teachers', labelKey: 'admin.navTeachers', icon: GraduationCap },
     { to: '/admin/students', labelKey: 'admin.navStudents', icon: Users },
     { to: '/admin/enrollments', labelKey: 'admin.navEnrollments', icon: CreditCard },
+    { to: '/admin/financial', labelKey: 'admin.navFinancial', icon: TrendingUp },
     { to: '/admin/offers', labelKey: 'admin.navOffers', icon: Tag },
-    { to: '/admin/loyalty', labelKey: 'admin.navLoyalty', icon: Gift },
+    { to: '/admin/categories', labelKey: 'admin.navCategories', icon: Tag },
     { to: '/admin/sessions', labelKey: 'admin.navSessions', icon: CalendarClock },
-    { to: '/admin/services', labelKey: 'admin.navServices', icon: Briefcase },
     { to: '/admin/contact', labelKey: 'admin.navContact', icon: MessageSquare, badge: unread },
-    { to: '/admin/notifications', labelKey: 'admin.navNotifications', icon: Bell },
     { to: '/admin/settings', labelKey: 'admin.navSettings', icon: Settings },
   ];
 

@@ -24,7 +24,10 @@ export function ProtectedRoute({ role }: Props) {
   }
 
   if (role && user.role !== role) {
-    return <Navigate to="/dashboard" replace />;
+    // superadmin can access admin routes
+    if (!(role === 'admin' && user.role === 'superadmin')) {
+      return <Navigate to="/dashboard" replace />;
+    }
   }
 
   return <Outlet />;

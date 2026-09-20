@@ -11,8 +11,6 @@ import {
   idParamSchema,
 } from '../validators/course.validators.js';
 import {
-  listContactQuerySchema,
-  updateContactSchema,
 } from '../validators/contact.validators.js';
 import {
   createTeacherSchema,
@@ -20,7 +18,7 @@ import {
   connectStudentSchema,
   addPaymentSchema,
   adminCreateInviteSchema,
-} from '../validators/adminUsers.validators';
+} from '../validators/adminUsers.validators.js';
 
 const router = Router();
 
@@ -45,6 +43,8 @@ router.get('/courses/:id/stats', validate({ params: idParamSchema }), adminUsers
 /* Teachers */
 router.get('/teachers', adminUsers.listTeachers);
 router.post('/teachers', validate({ body: createTeacherSchema }), adminUsers.createTeacher);
+router.get('/admins', adminUsers.listAdmins);
+router.post('/admins', validate({ body: createTeacherSchema }), adminUsers.createAdmin);
 router.patch(
   '/teachers/:id',
   validate({ params: idParamSchema, body: updateTeacherSchema }),
@@ -70,15 +70,25 @@ router.get('/enrollments/:id/payments', validate({ params: idParamSchema }), adm
 router.post('/invites', validate({ body: adminCreateInviteSchema }), adminUsers.adminCreateInvite);
 
 /* Contact messages */
-router.get('/contact', validate({ query: listContactQuerySchema }), contactController.adminListContact);
+router.get('/contact', adminUsers.listMessages);
 router.get('/contact/unread-count', contactController.adminUnreadCount);
-router.patch(
-  '/contact/:id',
-  validate({ params: idParamSchema, body: updateContactSchema }),
-  contactController.adminUpdateContact,
-);
+router.patch('/contact/:id', validate({ params: idParamSchema }), adminUsers.updateMessage);
 
-// Later modules mount: /students, /enrollments, /offers, /loyalty, /sessions,
-// /services, /notifications, /cms, /reports
+/* Categories */
+router.get('/categories', adminUsers.listCategories);
+router.post('/categories', adminUsers.addCategory);
+router.delete('/categories/:index', adminUsers.deleteCategory);
+
+/* Discounts */
+router.get('/discounts', adminUsers.listDiscounts);
+router.post('/discounts', adminUsers.createDiscount);
+router.patch('/discounts/:id', validate({ params: idParamSchema }), adminUsers.updateDiscount);
+router.delete('/discounts/:id', validate({ params: idParamSchema }), adminUsers.deleteDiscount);
+
+/* Financial report */
+router.get('/financial', adminUsers.financialReport);
+
+/* All-courses timetable */
+router.get('/timetable', adminUsers.timetable);
 
 export default router;

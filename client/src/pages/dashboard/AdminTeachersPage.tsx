@@ -1,16 +1,17 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, X, Loader2, Wallet } from 'lucide-react';
-import { Card } from '@/components/ui/card.tsx';
-import { Button } from '@/components/ui/button.tsx';
-import { Input } from '@/components/ui/input.tsx';
-import { Field } from '@/components/ui/field.tsx';
-import { Badge } from '@/components/ui/badge.tsx';
-import { Skeleton } from '@/components/ui/skeleton.tsx';
-import { PhoneField } from '@/components/ui/phone-field.tsx';
-import { toast } from '@/components/ui/toast.tsx';
-import { formatPrice } from '@/lib/utils.ts';
-import { adminApi, type TeacherRow } from '@/lib/admin.api.ts';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/store/auth.store';
+import { Input } from '@/components/ui/input';
+import { Field } from '@/components/ui/field';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { PhoneField } from '@/components/ui/phone-field';
+import { toast } from '@/components/ui/toast';
+import { formatPrice } from '@/lib/utils';
+import { adminApi, type TeacherRow } from '@/lib/admin.api';
 
 export default function AdminTeachersPage() {
   const { t, i18n } = useTranslation();
@@ -140,6 +141,114 @@ export default function AdminTeachersPage() {
                     {t('admin.settle')}
                   </Button>
                 )}
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Create marketing admin — superadmin only */}
+      <CreateAdminSection />
+    </div>
+  );
+}
+
+function CreateAdminSection() {
+  const { t, i18n } = useTranslation();
+  const user = useAuthStore((s) => s.user);
+  const [showForm, setShowForm] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [form, setForm] = useState({ name: '', phone: '', password: '' });
+  const [admins, setAdmins] = useState<{ _id: string; name: string; phone: string; inviteCount: number; earned: number }[]>([]);
+
+  if (user?.role !== 'superadmin') return null;
+
+  const load = () => {
+    adminApi.listAdmins().then(setAdmins).catch(() => setAdmins([]));
+  };
+
+  useEffect(load, []);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await adminApi.createAdmin(form);
+      toast.success(t('common.save'));
+      setForm({ name: '', phone: '', password: '' });
+      setShowForm(false);
+      load();
+    } catch (err) {
+      const msg = (err as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error?.message;
+      toast.error(msg || t('common.error'));
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-extrabold">{t('admin.adminAccounts')}</h2>
+        <Button onClick={() => setShowForm((v) => !v)}>
+          {showForm ? <X className="size-4" /> : <Plus className="size-4" />}
+          {t('admin.createAdmin')}
+        </Button>
+      </div>
+
+      {showForm && (
+        <Card className="p-6">
+          <h3 className="mb-4 font-bold">{t('admin.createAdmin')}</h3>
+          <form onSubmit={submit} className="space-y-4">
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field id="aname" label={t('auth.name')}>
+                <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} required />
+              </Field>
+              <Field id="aphone" label={t('auth.phone')}>
+                <PhoneField value={form.phone} onChange={(v) => setForm((f) => ({ ...f, phone: v }))} />
+              </Field>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field id="apassword" label={t('admin.password')}>
+                <Input type="text" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} dir="ltr" className="text-end" required />
+              </Field>
+            </div>
+            <div className="flex gap-3">
+              <Button type="submit" disabled={saving}>
+                {saving && <Loader2 className="size-4 animate-spin" />}
+                {t('common.save')}
+              </Button>
+              <Button type="button" variant="outline" onClick={() => setShowForm(false)}>
+                <X className="size-4" />{t('common.cancel')}
+              </Button>
+            </div>
+          </form>
+        </Card>
+      )}
+
+      {/* Admin accounts list */}
+      {admins.length === 0 ? (
+        <Card className="p-8 text-center text-muted-foreground">{t('admin.noData')}</Card>
+      ) : (
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {admins.map((a) => (
+            <Card key={a._id} className="p-5">
+              <div className="flex items-center gap-3">
+                <div className="grid size-11 place-items-center rounded-full bg-accent/20 font-bold text-accent-foreground">
+                  {a.name.charAt(0)}
+                </div>
+                <div className="min-w-0">
+                  <p className="truncate font-bold">{a.name}</p>
+                  <p className="text-xs text-muted-foreground" dir="ltr">{a.phone}</p>
+                </div>
+              </div>
+              <div className="mt-4 grid grid-cols-2 gap-2 text-center text-sm">
+                <div className="rounded-lg bg-muted/50 p-2">
+                  <p className="font-bold">{a.inviteCount}</p>
+                  <p className="text-xs text-muted-foreground">{t('admin.myInviteLinks')}</p>
+                </div>
+                <div className="rounded-lg bg-muted/50 p-2">
+                  <p className="font-bold text-success">{formatPrice(a.earned, i18n.language)}</p>
+                  <p className="text-xs text-muted-foreground">{t('admin.myEarnings')}</p>
+                </div>
               </div>
             </Card>
           ))}

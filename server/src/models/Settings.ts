@@ -5,7 +5,8 @@ import mongoose, { Schema, model, type Document } from 'mongoose';
  * loyalty tuning and global feature flags.
  */
 export interface ISettings extends Document {
-  key: string; // always 'global'
+  key: string;
+  categories: { ar: string; en: string; icon?: string }[];
   loyalty: {
     enabled: boolean;
     pointsPerEnrollment: number; // +5 per course taken
@@ -31,6 +32,10 @@ export interface ISettings extends Document {
 const settingsSchema = new Schema<ISettings>(
   {
     key: { type: String, default: 'global', unique: true },
+    categories: {
+      type: [{ ar: String, en: String, icon: { type: String, default: '' } }],
+      default: [],
+    },
     loyalty: {
       enabled: { type: Boolean, default: true },
       pointsPerEnrollment: { type: Number, default: 5 },
