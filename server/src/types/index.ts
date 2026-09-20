@@ -1,4 +1,4 @@
-export type Role = 'student' | 'teacher' | 'admin';
+export type Role = 'student' | 'teacher' | 'admin' | 'superadmin';
 
 export type CourseStatus = 'draft' | 'published' | 'coming_soon' | 'archived';
 

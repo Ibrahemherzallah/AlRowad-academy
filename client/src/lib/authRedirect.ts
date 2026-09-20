@@ -7,7 +7,7 @@ import type { User } from '@/lib/types';
  */
 export function postAuthDestination(user: User, next?: string | null): string {
   if (next && next !== '/dashboard') return next;
-  if (user.role === 'admin') return '/admin';
+  if (user.role === 'admin' || user.role === 'superadmin') return '/admin';
   if (user.role === 'teacher') return '/teacher';
   return '/dashboard';
 }

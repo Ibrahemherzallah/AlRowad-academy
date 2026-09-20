@@ -1,16 +1,17 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, X, Loader2, Wallet } from 'lucide-react';
-import { Card } from '@/components/ui/card.tsx';
-import { Button } from '@/components/ui/button.tsx';
-import { Input } from '@/components/ui/input.tsx';
-import { Field } from '@/components/ui/field.tsx';
-import { Badge } from '@/components/ui/badge.tsx';
-import { Skeleton } from '@/components/ui/skeleton.tsx';
-import { PhoneField } from '@/components/ui/phone-field.tsx';
-import { toast } from '@/components/ui/toast.tsx';
-import { formatPrice } from '@/lib/utils.ts';
-import { adminApi, type TeacherRow } from '@/lib/admin.api.ts';
+import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { useAuthStore } from '@/store/auth.store';
+import { Input } from '@/components/ui/input';
+import { Field } from '@/components/ui/field';
+import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
+import { PhoneField } from '@/components/ui/phone-field';
+import { toast } from '@/components/ui/toast';
+import { formatPrice } from '@/lib/utils';
+import { adminApi, type TeacherRow } from '@/lib/admin.api';
 
 export default function AdminTeachersPage() {
   const { t, i18n } = useTranslation();
@@ -144,6 +145,63 @@ export default function AdminTeachersPage() {
             </Card>
           ))}
         </div>
+      )}
+
+      {/* Create marketing admin — superadmin only */}
+      <CreateAdminSection />
+    </div>
+  );
+}
+
+function CreateAdminSection() {
+  const { t } = useTranslation();
+  const user = useAuthStore((s) => s.user);
+  const [show, setShow] = useState(false);
+  const [form, setForm] = useState({ name: '', phone: '', password: '' });
+  const [saving, setSaving] = useState(false);
+
+  if (user?.role !== 'superadmin') return null;
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSaving(true);
+    try {
+      await adminApi.createAdmin(form);
+      toast.success(t('admin.createAdmin'));
+      setForm({ name: '', phone: '', password: '' });
+      setShow(false);
+    } catch (err) {
+      const msg = (err as { response?: { data?: { error?: { message?: string } } } })?.response?.data?.error?.message;
+      toast.error(msg || t('common.error'));
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-xl font-bold">{t('admin.adminAccounts')}</h2>
+        <Button size="sm" onClick={() => setShow((v) => !v)}>
+          <Plus className="size-4" />{t('admin.createAdmin')}
+        </Button>
+      </div>
+      {show && (
+        <Card className="max-w-md p-6">
+          <form onSubmit={submit} className="space-y-4">
+            <Field id="aname" label={t('admin.name')}>
+              <Input value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} required />
+            </Field>
+            <Field id="aphone" label={t('admin.phone')}>
+              <Input value={form.phone} onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))} dir="ltr" required />
+            </Field>
+            <Field id="apass" label={t('admin.password')}>
+              <Input type="password" value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} dir="ltr" required />
+            </Field>
+            <Button type="submit" disabled={saving}>
+              {saving ? <Loader2 className="size-4 animate-spin" /> : <Plus className="size-4" />}
+              {t('admin.createAdmin')}
+            </Button>
+          </form>
+        </Card>
       )}
     </div>
   );

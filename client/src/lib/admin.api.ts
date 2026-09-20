@@ -80,4 +80,7 @@ export const adminApi = {
 
   createAdminInvite: async (courseId: string) =>
     unwrap((await api.post<ApiEnvelope<{ code: string; url: string; uses: number }>>('/admin/invites', { courseId })).data),
+
+  createAdmin: async (data: { name: string; phone: string; password: string }) =>
+    unwrap((await api.post<ApiEnvelope<unknown>>('/admin/admins', data)).data),
 };

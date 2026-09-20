@@ -20,7 +20,7 @@ import {
   connectStudentSchema,
   addPaymentSchema,
   adminCreateInviteSchema,
-} from '../validators/adminUsers.validators';
+} from '../validators/adminUsers.validators.js';
 
 const router = Router();
 
@@ -45,6 +45,7 @@ router.get('/courses/:id/stats', validate({ params: idParamSchema }), adminUsers
 /* Teachers */
 router.get('/teachers', adminUsers.listTeachers);
 router.post('/teachers', validate({ body: createTeacherSchema }), adminUsers.createTeacher);
+router.post('/admins', validate({ body: createTeacherSchema }), adminUsers.createAdmin);
 router.patch(
   '/teachers/:id',
   validate({ params: idParamSchema, body: updateTeacherSchema }),

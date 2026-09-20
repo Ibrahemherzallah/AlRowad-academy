@@ -445,7 +445,16 @@
     "addPaymentTo": "Add payment",
     "viewPayments": "View payments",
     "noMinimum": "No minimum",
-    "anyAmount": "Any amount"
+    "anyAmount": "Any amount",
+    "teacherCommissions": "Teacher commissions owed",
+    "adminCommissions": "Marketing admin commissions (2%)",
+    "owed": "Owed to teachers",
+    "collected": "Collected for academy",
+    "myInviteLinks": "My invite links",
+    "myEarnings": "My earnings (2%)",
+    "createAdmin": "Create marketing admin",
+    "adminAccounts": "Marketing admin accounts",
+    "manageTeachers": "Manage teachers"
   },
   "teacher": {
     "panel": "Teacher Panel",

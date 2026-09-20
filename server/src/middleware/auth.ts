@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '../utils/tokens.js';
 import { ApiError } from '../utils/apiError.js';
-import type { Role } from '../types/index.js';
+import type { Role } from './index';
 
 export interface AuthedRequest extends Request {
   user?: { id: string; role: Role };
@@ -27,7 +27,9 @@ export function authenticate(req: AuthedRequest, _res: Response, next: NextFunct
 export function requireRole(...roles: Role[]) {
   return (req: AuthedRequest, _res: Response, next: NextFunction): void => {
     if (!req.user) return next(ApiError.unauthorized());
-    if (!roles.includes(req.user.role)) return next(ApiError.forbidden('Insufficient permissions'));
+    // superadmin always passes every role check
+    if (req.user.role !== 'superadmin' && !roles.includes(req.user.role))
+      return next(ApiError.forbidden('Insufficient permissions'));
     next();
   };
 }

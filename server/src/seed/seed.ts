@@ -7,7 +7,7 @@ import { Offer } from '../models/Offer.js';
 import { getSettings } from '../models/Settings.js';
 import { ensureLoyaltyAccount, awardEnrollmentPoints } from '../services/loyalty.service.js';
 import { logger } from '../utils/logger.js';
-import { SEED_COURSES, SEED_STUDENTS, SEED_OFFERS } from './seedData';
+import { SEED_COURSES, SEED_STUDENTS, SEED_OFFERS } from './seedData.js';
 
 /** Pass --fresh to wipe existing collections before seeding. */
 const FRESH = process.argv.includes('--fresh');
@@ -37,14 +37,20 @@ async function seed() {
       name: 'مدير الأكاديمية',
       phone: '+970590000000',
       passwordHash: await hashPassword('Admin@12345'),
-      role: 'admin',
+      role: 'superadmin',
       isVerified: true,
       city: 'الخليل',
     });
     await ensureLoyaltyAccount(admin._id.toString());
-    logger.info(`👤 Admin created: ${adminPhone} / Admin@12345`);
+    logger.info(`👤 Superadmin created: ${adminPhone} / Admin@12345`);
   } else {
-    logger.info('👤 Admin already exists');
+    // Upgrade existing admin to superadmin if not already
+    if (admin.role === 'admin') {
+      await User.updateOne({ _id: admin._id }, { role: 'superadmin' });
+      logger.info(`👤 Admin upgraded to superadmin: ${adminPhone}`);
+    } else {
+      logger.info('👤 Superadmin already exists');
+    }
   }
 
   /* ---------- Courses ---------- */

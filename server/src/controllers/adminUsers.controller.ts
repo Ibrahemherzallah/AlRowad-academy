@@ -1,17 +1,17 @@
 import type { Response } from 'express';
 import { Types } from 'mongoose';
-import { User, hashPassword } from '../models/User.js';
+import { User, hashPassword } from '../models/User';
 import { Course } from '../models/Course.js';
 import { Enrollment } from '../models/Enrollment.js';
 import { TeacherCommission } from '../models/TeacherCommission.js';
-import { InviteLink } from '../models/InviteLink';
+import { InviteLink } from '../models/InviteLink.js';
 import { ensureLoyaltyAccount } from '../services/loyalty.service.js';
-import { createReservation, recordPayment } from '../services/enrollment.service';
+import { createReservation, recordPayment } from '../services/enrollment.service.js';
 import { getSettings } from '../models/Settings.js';
 import { ApiError } from '../utils/apiError.js';
 import { catchAsync } from '../utils/catchAsync.js';
 import { ok } from '../utils/apiResponse.js';
-import type { AuthedRequest } from '../middleware/auth.js';
+import type { AuthedRequest } from '../middleware/auth';
 
 /* ---------------- Teachers ---------------- */
 
@@ -43,6 +43,17 @@ export const createTeacher = catchAsync(async (req: AuthedRequest, res: Response
   });
   await ensureLoyaltyAccount(teacher._id.toString());
   return ok(res, teacher, 201);
+});
+
+/** POST /api/admin/admins — create a marketing admin account (superadmin only). */
+export const createAdmin = catchAsync(async (req: AuthedRequest, res: Response) => {
+  if (req.user!.role !== 'superadmin') throw ApiError.forbidden('Only superadmin can create admin accounts');
+  const { name, phone, password } = req.body as { name: string; phone: string; password: string };
+  const exists = await User.findOne({ phone });
+  if (exists) throw ApiError.conflict('Phone already registered');
+  const passwordHash = await hashPassword(password);
+  const admin = await User.create({ name, phone, passwordHash, role: 'admin', isVerified: true });
+  return ok(res, admin, 201);
 });
 
 /** GET /api/admin/teachers — list teachers with course + earnings counts. */

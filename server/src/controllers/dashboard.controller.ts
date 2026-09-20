@@ -1,15 +1,17 @@
 import type { Response } from 'express';
 import { Types } from 'mongoose';
-import { Enrollment } from '@/models';
-import { Course } from '@/models';
-import { User } from '@/models';
-import { Session } from '@/models';
-import { LoyaltyVoucher } from '@/models';
-import { getSettings } from '@/models';
-import { ensureLoyaltyAccount } from '@/services/loyalty.service.js';
-import { catchAsync } from '@/utils/catchAsync';
-import { ok } from '@/utils/apiResponse';
-import type { AuthedRequest } from '@/middleware/auth';
+import { Enrollment } from '../models/Enrollment.js';
+import { Course } from '../models/Course.js';
+import { User } from '../models/User';
+import { Session } from '../models/Session.js';
+import { LoyaltyVoucher } from '../models/LoyaltyVoucher.js';
+import { InviteLink } from '../models/InviteLink.js';
+import { TeacherCommission } from '../models/TeacherCommission.js';
+import { getSettings } from '../models/Settings.js';
+import { ensureLoyaltyAccount } from '../services/loyalty.service.js';
+import { catchAsync } from '../utils/catchAsync.js';
+import { ok } from '../utils/apiResponse.js';
+import type { AuthedRequest } from '../middleware/auth.js';
 
 /**
  * GET /api/dashboard/student
@@ -105,19 +107,21 @@ async function referredStudentIds(studentId: Types.ObjectId): Promise<Types.Obje
  * Admin overview: totals, revenue (month/all-time), active enrollments,
  * pending manual payments, upcoming sessions.
  */
-export const adminOverview = catchAsync(async (_req: AuthedRequest, res: Response) => {
+export const adminOverview = catchAsync(async (req: AuthedRequest, res: Response) => {
+  const isSuperAdmin = req.user!.role === 'superadmin';
+  const adminId = new Types.ObjectId(req.user!.id);
+
   const startOfMonth = new Date();
   startOfMonth.setDate(1);
   startOfMonth.setHours(0, 0, 0, 0);
 
+  // Base stats every admin sees
   const [
     totalStudents,
     activeEnrollments,
     pendingPayments,
     upcomingSessions,
     totalCourses,
-    revenueAgg,
-    revenueMonthAgg,
     recentEnrollments,
   ] = await Promise.all([
     User.countDocuments({ role: 'student' }),
@@ -125,14 +129,6 @@ export const adminOverview = catchAsync(async (_req: AuthedRequest, res: Respons
     Enrollment.countDocuments({ paymentStatus: { $in: ['pending', 'partial'] } }),
     Session.countDocuments({ status: 'scheduled', scheduledAt: { $gte: new Date() } }),
     Course.countDocuments(),
-    Enrollment.aggregate([
-      { $match: { paymentStatus: { $in: ['paid', 'partial'] } } },
-      { $group: { _id: null, total: { $sum: '$amountPaid' } } },
-    ]),
-    Enrollment.aggregate([
-      { $match: { paymentStatus: { $in: ['paid', 'partial'] }, createdAt: { $gte: startOfMonth } } },
-      { $group: { _id: null, total: { $sum: '$amountPaid' } } },
-    ]),
     Enrollment.find()
       .populate('studentId', 'name phone')
       .populate('courseId', 'title')
@@ -140,7 +136,55 @@ export const adminOverview = catchAsync(async (_req: AuthedRequest, res: Respons
       .limit(6),
   ]);
 
+  // Revenue — superadmin only
+  let revenue = null;
+  if (isSuperAdmin) {
+    const [revenueAgg, revenueMonthAgg, teacherCommAgg, adminCommAgg] = await Promise.all([
+      Enrollment.aggregate([
+        { $match: { paymentStatus: { $in: ['paid', 'partial'] } } },
+        { $group: { _id: null, total: { $sum: '$amountPaid' } } },
+      ]),
+      Enrollment.aggregate([
+        { $match: { paymentStatus: { $in: ['paid', 'partial'] }, createdAt: { $gte: startOfMonth } } },
+        { $group: { _id: null, total: { $sum: '$amountPaid' } } },
+      ]),
+      // Teacher commissions owed
+      TeacherCommission.aggregate([
+        { $match: { status: 'accrued' } },
+        { $group: { _id: null, total: { $sum: '$amount' } } },
+      ]),
+      // Admin invite commissions (2% academy revenue already paid)
+      TeacherCommission.aggregate([
+        { $match: { status: 'paid', rate: 0.02 } },
+        { $group: { _id: null, total: { $sum: '$amount' } } },
+      ]),
+    ]);
+    revenue = {
+      allTime: revenueAgg[0]?.total ?? 0,
+      thisMonth: revenueMonthAgg[0]?.total ?? 0,
+      teacherCommissionsOwed: teacherCommAgg[0]?.total ?? 0,
+      adminCommissions: adminCommAgg[0]?.total ?? 0,
+    };
+  }
+
+  // Marketing admin: their own invite stats
+  let myInvites = null;
+  if (!isSuperAdmin) {
+    const [myInviteCount, myCommissions] = await Promise.all([
+      InviteLink.countDocuments({ inviterId: adminId, inviterRole: 'admin' }),
+      TeacherCommission.aggregate([
+        { $match: { teacherId: adminId, status: 'paid' } },
+        { $group: { _id: null, total: { $sum: '$amount' } } },
+      ]),
+    ]);
+    myInvites = {
+      count: myInviteCount,
+      earned: myCommissions[0]?.total ?? 0,
+    };
+  }
+
   return ok(res, {
+    role: req.user!.role,
     totals: {
       students: totalStudents,
       courses: totalCourses,
@@ -148,10 +192,8 @@ export const adminOverview = catchAsync(async (_req: AuthedRequest, res: Respons
       pendingPayments,
       upcomingSessions,
     },
-    revenue: {
-      allTime: revenueAgg[0]?.total ?? 0,
-      thisMonth: revenueMonthAgg[0]?.total ?? 0,
-    },
+    revenue,   // null for regular admin
+    myInvites, // null for superadmin
     recentEnrollments: recentEnrollments.map((e) => ({
       id: e._id,
       student: e.studentId,

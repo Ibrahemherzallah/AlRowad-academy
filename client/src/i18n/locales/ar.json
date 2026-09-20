@@ -446,7 +446,16 @@
     "addPaymentTo": "إضافة دفعة",
     "viewPayments": "عرض الدفعات",
     "noMinimum": "بدون حد أدنى",
-    "anyAmount": "أي مبلغ"
+    "anyAmount": "أي مبلغ",
+    "teacherCommissions": "عمولات المعلمين المستحقة",
+    "adminCommissions": "عمولات المسوّقين (2%)",
+    "owed": "مستحقة للمعلمين",
+    "collected": "محصّلة للأكاديمية",
+    "myInviteLinks": "روابط الدعوة الخاصة بي",
+    "myEarnings": "عمولاتي (2%)",
+    "createAdmin": "إنشاء حساب مسوّق",
+    "adminAccounts": "حسابات المسوّقين",
+    "manageTeachers": "إدارة المعلمين"
   },
   "teacher": {
     "panel": "لوحة المعلّم",

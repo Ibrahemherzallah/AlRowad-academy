@@ -1,7 +1,7 @@
 import mongoose, { Schema, model, type Document, type Types } from 'mongoose';
 import bcrypt from 'bcryptjs';
 import { customAlphabet } from 'nanoid';
-import type { Role } from '@/types';
+import type { Role } from './index';
 
 const refCode = customAlphabet('ABCDEFGHJKLMNPQRSTUVWXYZ23456789', 8);
 
@@ -34,7 +34,7 @@ const userSchema = new Schema<IUser>(
     phone: { type: String, required: true, unique: true, trim: true, index: true },
     passwordHash: { type: String, required: true, select: false },
     city: { type: String, trim: true },
-    role: { type: String, enum: ['student', 'teacher', 'admin'], default: 'student', index: true },
+    role: { type: String, enum: ['student', 'teacher', 'admin', 'superadmin'], default: 'student', index: true },
     referralCode: { type: String, unique: true, index: true },
     referredBy: { type: Schema.Types.ObjectId, ref: 'User', default: null },
     loyaltyAccountId: { type: Schema.Types.ObjectId, ref: 'LoyaltyAccount', default: null },

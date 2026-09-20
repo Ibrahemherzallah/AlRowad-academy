@@ -45,6 +45,7 @@ export async function fetchStudentOverview(): Promise<StudentOverview> {
 /* ---------- Admin ---------- */
 
 export interface AdminOverview {
+  role: string;
   totals: {
     students: number;
     courses: number;
@@ -52,7 +53,13 @@ export interface AdminOverview {
     pendingPayments: number;
     upcomingSessions: number;
   };
-  revenue: { allTime: number; thisMonth: number };
+  revenue: {
+    allTime: number;
+    thisMonth: number;
+    teacherCommissionsOwed: number;
+    adminCommissions: number;
+  } | null;
+  myInvites: { count: number; earned: number } | null;
   recentEnrollments: {
     id: string;
     student: { name: string; phone: string } | null;
