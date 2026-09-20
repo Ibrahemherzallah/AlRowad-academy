@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import { verifyAccessToken } from '../utils/tokens.js';
 import { ApiError } from '../utils/apiError.js';
-import type { Role } from './index';
+export type Role = 'student' | 'teacher' | 'admin' | 'superadmin';
 
 export interface AuthedRequest extends Request {
   user?: { id: string; role: Role };

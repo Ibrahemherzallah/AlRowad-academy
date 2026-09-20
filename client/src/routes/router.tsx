@@ -28,6 +28,11 @@ import TeacherEarningsPage from '@/pages/teacher/TeacherEarningsPage';
 import TeacherStudentsPage from '@/pages/teacher/TeacherStudentsPage';
 import JoinCoursePage from '@/pages/JoinCoursePage';
 import PlaceholderPage from '@/pages/PlaceholderPage';
+import AdminFinancialPage from '@/pages/dashboard/AdminFinancialPage';
+import AdminCategoriesPage from '@/pages/dashboard/AdminCategoriesPage';
+import AdminOffersPage from '@/pages/dashboard/AdminOffersPage';
+import AdminContactPage from '@/pages/dashboard/AdminContactPage';
+import AdminSessionsPage from '@/pages/dashboard/AdminSessionsPage';
 import NotFoundPage from '@/pages/NotFoundPage';
 
 /**
@@ -95,11 +100,13 @@ export const router = createBrowserRouter([
           { path: 'teachers', element: <AdminTeachersPage /> },
           { path: 'students', element: <AdminStudentsPage /> },
           { path: 'enrollments', element: <AdminEnrollmentsPage /> },
-          { path: 'offers', element: <PlaceholderPage titleKey="admin.navOffers" /> },
+          { path: 'offers', element: <AdminOffersPage /> },
+          { path: 'categories', element: <AdminCategoriesPage /> },
+          { path: 'financial', element: <AdminFinancialPage /> },
           { path: 'loyalty', element: <PlaceholderPage titleKey="admin.navLoyalty" /> },
-          { path: 'sessions', element: <PlaceholderPage titleKey="admin.navSessions" /> },
+          { path: 'sessions', element: <AdminSessionsPage /> },
           { path: 'services', element: <PlaceholderPage titleKey="admin.navServices" /> },
-          { path: 'contact', element: <PlaceholderPage titleKey="admin.navContact" /> },
+          { path: 'contact', element: <AdminContactPage /> },
           { path: 'notifications', element: <PlaceholderPage titleKey="admin.navNotifications" /> },
           { path: 'settings', element: <PlaceholderPage titleKey="admin.navSettings" /> },
         ],

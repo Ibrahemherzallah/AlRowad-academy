@@ -83,4 +83,31 @@ export const adminApi = {
 
   createAdmin: async (data: { name: string; phone: string; password: string }) =>
     unwrap((await api.post<ApiEnvelope<unknown>>('/admin/admins', data)).data),
+
+  listAdmins: async () =>
+    unwrap((await api.get<ApiEnvelope<{ _id: string; name: string; phone: string; inviteCount: number; earned: number; createdAt: string }[]>>('/admin/admins')).data),
+
+  // Categories
+  listCategories: async () => unwrap((await api.get<ApiEnvelope<{ ar: string; en: string; icon?: string }[]>>('/admin/categories')).data),
+  addCategory: async (data: { ar: string; en: string; icon?: string }) =>
+    unwrap((await api.post<ApiEnvelope<unknown[]>>('/admin/categories', data)).data),
+  deleteCategory: async (index: number) =>
+    unwrap((await api.delete<ApiEnvelope<unknown[]>>(`/admin/categories/${index}`)).data),
+
+  // Discounts
+  listDiscounts: async () => unwrap((await api.get<ApiEnvelope<unknown[]>>('/admin/discounts')).data),
+  createDiscount: async (data: unknown) => unwrap((await api.post<ApiEnvelope<unknown>>('/admin/discounts', data)).data),
+  updateDiscount: async (id: string, data: unknown) => unwrap((await api.patch<ApiEnvelope<unknown>>(`/admin/discounts/${id}`, data)).data),
+  deleteDiscount: async (id: string) => unwrap((await api.delete<ApiEnvelope<unknown>>(`/admin/discounts/${id}`)).data),
+
+  // Messages
+  listMessages: async () => unwrap((await api.get<ApiEnvelope<unknown[]>>('/admin/contact')).data),
+  updateMessage: async (id: string, status: string) =>
+    unwrap((await api.patch<ApiEnvelope<unknown>>(`/admin/contact/${id}`, { status })).data),
+
+  // Financial
+  financialReport: async () => unwrap((await api.get<ApiEnvelope<unknown>>('/admin/financial')).data),
+
+  // Timetable
+  timetable: async () => unwrap((await api.get<ApiEnvelope<unknown[]>>('/admin/timetable')).data),
 };

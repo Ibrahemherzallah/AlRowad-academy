@@ -71,7 +71,7 @@ export default function CoursesPage() {
     if (key !== 'page') next.set('page', '1');
     setParams(next);
   };
-  console.log("ddddddddddddd categories" , categories)
+
   return (
     <div className="container py-12">
       <header className="mb-8">
@@ -102,9 +102,9 @@ export default function CoursesPage() {
           >
             <option value="">{t('courses.allCategories')}</option>
             {categories.map((c, i) => (
-                <option key={i} value={c.ar}>
-                  {c.icon ? `${c.icon} ` : ''}{i18n.language === 'ar' ? c.ar : (c.en || c.ar)}
-                </option>
+              <option key={i} value={c.ar}>
+                {c.icon ? `${c.icon} ` : ''}{i18n.language === 'ar' ? c.ar : (c.en || c.ar)}
+              </option>
             ))}
           </Select>
           <Select

@@ -4,6 +4,7 @@ import { Course, type ICourse } from '../models/Course.js';
 import { Enrollment } from '../models/Enrollment.js';
 import { ClassSchedule } from '../models/ClassSchedule.js';
 import { User } from '../models/User.js';
+import { getSettings } from '../models/Settings.js';
 import { ApiError } from '../utils/apiError.js';
 import { catchAsync } from '../utils/catchAsync.js';
 import { ok } from '../utils/apiResponse.js';
@@ -68,19 +69,17 @@ export const listCourses = catchAsync(async (req: Request, res: Response) => {
   ]);
 
   return ok(
-    res,
-    courses.map(publicCourse),
-    200,
-    { page: q.page, limit: q.limit, total },
+      res,
+      courses.map(publicCourse),
+      200,
+      { page: q.page, limit: q.limit, total },
   );
 });
 
-/** GET /api/courses/categories — distinct categories among visible courses. */
+/** GET /api/courses/categories — categories from global settings. */
 export const listCategories = catchAsync(async (_req: Request, res: Response) => {
-  const categories = await Course.distinct('category', {
-    status: { $in: ['published', 'coming_soon'] },
-  });
-  return ok(res, categories);
+  const settings = await getSettings();
+  return ok(res, settings.categories ?? []);
 });
 
 /** GET /api/courses/:slug — public single course landing data. */
@@ -148,9 +147,9 @@ export const deleteCourse = catchAsync(async (req: AuthedRequest, res: Response)
     return ok(res, { message: 'Course permanently deleted' });
   }
   const course = await Course.findByIdAndUpdate(
-    req.params.id,
-    { status: 'archived' },
-    { new: true },
+      req.params.id,
+      { status: 'archived' },
+      { new: true },
   );
   if (!course) throw ApiError.notFound('Course not found');
   return ok(res, course);
